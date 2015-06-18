@@ -51,6 +51,7 @@
             'lib/angular-material/angular-material.js',
             'lib/lodash/lodash.js',
             'lib/lrInfiniteScroll/lrInfiniteScroll.js',
+            'lib/angular-leaflet-directive/dist/angular-leaflet-directive.js',
             'lib/angulartics/src/angulartics.js',
             'lib/angulartics/src/angulartics-ga.js'
         ],

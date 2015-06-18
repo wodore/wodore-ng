@@ -18,7 +18,7 @@ if DEVELOPMENT:
 
     CURRENT_VERSION_TIMESTAMP = calendar.timegm(datetime.utcnow().timetuple())
 CURRENT_VERSION_DATE = datetime.utcfromtimestamp(CURRENT_VERSION_TIMESTAMP)
-# model needs to be improted after setting CURRENT_VERSION_DATE, since model.Base
+# model needs to be imported after setting CURRENT_VERSION_DATE, since model.Base
 # uses is as default value for version property
 import model
 CONFIG_DB = model.Config.get_master_db()

@@ -10,6 +10,7 @@
     <script src="/p/lib/angular-material/angular-material.js"></script>
     <script src="/p/lib/lodash/lodash.js"></script>
     <script src="/p/lib/lrInfiniteScroll/lrInfiniteScroll.js"></script>
+    <script src="/p/lib/angular-leaflet-directive/dist/angular-leaflet-directive.js"></script>
     <script src="/p/lib/angulartics/src/angulartics.js"></script>
     <script src="/p/lib/angulartics/src/angulartics-ga.js"></script>
     <script src="/p/application.js"></script>
@@ -46,10 +47,13 @@
     <script src="/p/modules/users/auth/password/reset.client.controller.js"></script>
     <!-- endinject -->
 # else
+    <!-- Leaflet cdn TODO -->
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
+# endif
+    <!-- libs -->
     <script src="/p/dist/libs.min.js?{{ config.CURRENT_VERSION_ID }}"></script>
     <script src="/p/dist/scripts.min.js?{{ config.CURRENT_VERSION_ID }}"></script>
     <script src="/p/dist/templates.js?{{ config.CURRENT_VERSION_ID }}"></script>
-# endif
 # if config.DEVELOPMENT
     <script src="http://{{ request.host.split(':')[0] }}:35729/livereload.js"></script>
 # endif
