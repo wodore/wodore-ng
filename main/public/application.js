@@ -6,7 +6,7 @@
 var AppConfig = (function() {
     'use strict';
     // Init module configuration options
-    var applicationModuleName = 'gae-angular-material-starter';
+    var applicationModuleName = 'wodore-ng';
     var applicationModuleVendorDependencies = [
         'ngAnimate',
         'ngMessages',
@@ -16,7 +16,8 @@ var AppConfig = (function() {
         'ngMaterial',
         'lrInfiniteScroll',
         'angulartics',
-        'angulartics.google.analytics'
+        'angulartics.google.analytics',
+        'leaflet-directive'
     ];
 
     // Add a new vertical module
