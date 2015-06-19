@@ -1,7 +1,10 @@
 <div data-ng-controller="SidenavController">
     <md-toolbar>
-        <div layout="row" layout-align="center center" class="md-toolbar-tools">
+        <div layout="row" layout-align="left center" class="md-toolbar-tools">
             <h1 class="nowrap">
+    <md-button tabindex="-1" hide-gt-md  ng-click="closeSidenav()" aria-label="Show Menu">
+        <md-icon md-font-icon="fa fa-arrow-left"></md-icon>
+    </md-button>
                 <a ui-sref="home" tabindex="-1">
                     <span class="f-400">{{ cfg.brand_name }}</span>
                 </a>

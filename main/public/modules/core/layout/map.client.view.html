@@ -1,0 +1,6 @@
+<div data-ng-controller="BackMapController" style="position:absolute;height:100%" layout="row" layout-fill>
+  <leaflet width="{{screen_gt_md && 'calc(100% - 304px)' || '100%'}}" 
+          height="calc(100% - 64px)" center="center" 
+          tiles="tiles" layers="layers" defaults="defaults"
+          style="position:relative;" ></leaflet>
+</div>
