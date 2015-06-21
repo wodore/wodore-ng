@@ -14,5 +14,5 @@ License MIT, see LICENSE for more details.
 """
 
 __version__ = '1'
-from .main import API
-from .main import app
+#from .main import API
+#from .main import app
