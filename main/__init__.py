@@ -14,5 +14,10 @@ License MIT, see LICENSE for more details.
 """
 
 __version__ = '1'
-#from .main import API
-#from .main import app
+
+# During test the import fails.
+try:
+    from .main import API
+    from .main import app
+except AssertionError:
+    print "[main init] import did not work."

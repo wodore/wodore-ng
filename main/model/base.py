@@ -141,3 +141,30 @@ class Base(ndb.Model):
         return ['key', 'id'] + _.keys(cls._properties)
 
 
+    # new methods
+    @classmethod
+    def id_to_key(cls,id):
+        """Returns key from an id """
+        try:
+            id = long(id)
+        except ValueError:
+            pass  # it was a string, not an int.
+
+        return ndb.Key(cls._get_kind(),id)
+
+    @classmethod
+    @ndb.transactional
+    def get_or_create(cls, id, parent=None, **kwargs):
+        """Get or create a ndb DB
+
+        Returns
+            (db, new)
+        """
+        key = ndb.Key(cls, id, parent=parent)
+        ent = key.get()
+        if ent is not None:
+            return (ent, False)  # False meaning "not created"
+        ent = cls(**kwargs)
+        ent.key = key
+        ent.put()
+        return (ent, True)  # True meaning "created"
