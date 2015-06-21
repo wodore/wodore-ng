@@ -11,6 +11,6 @@ from .user import User, UserValidator
 #from .route import Route, RouteRefStructure, RouteDrawingStructure
 #from .waypoint import WayPoint
 #from .tag import TagStructure, Tag, TagRelation, Taggable
-#from .icon import Iconize, Icon
+from .icon import Iconize, Icon, IconValidator
 from .collection import Collection, CollectionUser, AddCollection
 from .collection import CollectionValidator

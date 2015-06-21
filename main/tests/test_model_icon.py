@@ -89,12 +89,12 @@ class TestIcon(unittest.TestCase):
     self.assertEqual(i1.collection, self.col1)
 
   def test_init_icon_toplevel_and_incr(self):
-    top = model.Icon(icon=self.i1s_name,name='i' )
+    top = model.Icon(icon=self.i1s_name,name='i1' )
     top_key = top.put()
-    one = model.Icon(icon=self.i1s_name,name='i',
+    one = model.Icon(icon=self.i1s_name,name='i1',
         collection=self.col1,
         toplevel=top_key)
-    two = model.Icon(icon=self.i1s_name,name='i',
+    two = model.Icon(icon=self.i1s_name,name='i1',
         collection=self.col2,
         toplevel=top_key)
     two.put()
@@ -145,7 +145,7 @@ class TestIcon(unittest.TestCase):
   def test_add_multiple_icon_collections(self):
     icon = model.Icon()
     icon.collection = self.col1
-    icon.name = 'i'
+    icon.name = 'i1'
     icon.icon = self.i1s_name
     icon_key = icon._add_and_put()
 
@@ -172,26 +172,26 @@ class TestIcon(unittest.TestCase):
     2. Two children
     3. A 'children' icon without a topevel icon
     """
-    key = model.Icon.create(icon=self.i1s_name,name='i')
+    key = model.Icon.create(icon=self.i1s_name,name='i1')
     icon_db = key.get()
     self.assertEqual(icon_db.key , key)
     self.assertEqual(icon_db.collection , self.colg)
     self.assertEqual(getattr(icon_db,'toplevel',None) , None)
     # create the same with collection
-    key2 = model.Icon.create(icon=self.i1s_name,name='i',
+    key2 = model.Icon.create(icon=self.i1s_name,name='i1',
         collection=self.col1,
         toplevel=key)
     icon2_db = key2.get()
     self.assertEqual(icon2_db.key , key2)
     self.assertEqual(icon2_db.collection , self.col1)
     self.assertEqual(icon2_db.count,1)
-    key3 = model.Icon.create(icon=self.i1s_name,name='i',
+    key3 = model.Icon.create(icon=self.i1s_name,name='i1',
         collection=self.col2,
         toplevel=key)
     icon_db = key.get()
     self.assertEqual(icon_db.count,3)
     # auto=False, no  new toplevel
-    key4 = model.Icon.create(icon=self.i1s_name,name='i',
+    key4 = model.Icon.create(icon=self.i1s_name,name='i1',
         collection=self.col2,
         auto = False)
     icon4_db = key.get()
@@ -201,7 +201,7 @@ class TestIcon(unittest.TestCase):
   def test_add_icon(self):
     """ Test for adding icons """
     # Create global icon
-    key = model.Icon.create(icon=self.i1s_name,name='i')
+    key = model.Icon.create(icon=self.i1s_name,name='i1')
     # Add a second
     model.Icon.add(key)
     icon_db = key.get()
@@ -256,7 +256,7 @@ class TestIcon(unittest.TestCase):
   def test_remove_icon(self):
     """ Test for adding icons """
     # Create global icon
-    key = model.Icon.create(icon=self.i1s_name,name='i')
+    key = model.Icon.create(icon=self.i1s_name,name='i1')
     # Add a second
     model.Icon.add(key)
     icon_db = key.get()
@@ -274,7 +274,7 @@ class TestIcon(unittest.TestCase):
     self.assertEqual(icon2_db.count,0)
 
   def test_get_icon_by_toplevel(self):
-    key = model.Icon.create(icon=self.i1s_name,name='i')
+    key = model.Icon.create(icon=self.i1s_name,name='i1')
     for i in range(0,10):
       key2 = model.Icon.add(key,collection=self.col2)
       key3 = model.Icon.add(key,collection=self.col3)
@@ -294,7 +294,7 @@ class TestIcon(unittest.TestCase):
     self.assertTrue(dbs[0].cnt > dbs[-1].cnt)
     # get all toplevel
     # create a new global key
-    keyNew = model.Icon.create(icon=self.i1s_name,name='i')
+    keyNew = model.Icon.create(icon=self.i1s_name,name='i1')
     top_dbs = model.Icon.get_by_toplevel(collection=self.colg)
     self.assertEqual(len(top_dbs),2)
     # test with collections
@@ -304,13 +304,13 @@ class TestIcon(unittest.TestCase):
     self.assertEqual(len(test12_dbs),1)
 
   def test_icon_query(self):
-    key = model.Icon.create(icon=self.i1s_name,name='i')
+    key = model.Icon.create(icon=self.i1s_name,name='i1')
     for i in range(0,10):
       key2 = model.Icon.add(key,collection=self.col2)
       key3 = model.Icon.add(key,collection=self.col3)
       key3a = model.Icon.add(key3,collection=self.col3a,as_child=True)
       key10 = model.Icon.add(key,collection=ndb.Key('Collection','test{}'.format(i+10)))
-    keyA = model.Icon.create(icon=self.i1s_name,name='i',private=True)
+    keyA = model.Icon.create(icon=self.i1s_name,name='i1',private=True)
     keyB = model.Icon.create(icon=self.i1s_name,name='i2')
     icon_db = key.get()
     icon2_db = key2.get()
@@ -320,7 +320,7 @@ class TestIcon(unittest.TestCase):
     self.assertEqual(len(model.Icon.qry(private=True).fetch()),16)
     self.assertEqual(len(model.Icon.qry(key3).fetch()),1)
     self.assertEqual(len(model.Icon.qry(key).fetch()),12)
-    self.assertEqual(len(model.Icon.qry(name='i',private=True).fetch()),15)
+    self.assertEqual(len(model.Icon.qry(name='i1',private=True).fetch()),15)
 
 
 
@@ -366,8 +366,8 @@ class TestIconizedModel(unittest.TestCase):
 
 
   def test_iconized_init(self):
-    im = TestIconModel(name="X")
-    im.create_icon(self.i1s_name,name='1')
+    im = TestIconModel(name="X1")
+    im.create_icon(self.i1s_name,name='i1')
     key1 = im.put()
     im_db = key1.get()
     assert im_db.icon_id is not None
@@ -383,8 +383,8 @@ class TestIconizedModel(unittest.TestCase):
     self.assertEqual(icon_dbs[0].key.id(),im2_db.icon_id)
 
   def test_iconized_with_collection(self):
-    im = TestIconModel(name="X",collection=self.col1)
-    im.create_icon(self.i1s_name,name='1')
+    im = TestIconModel(name="X1",collection=self.col1)
+    im.create_icon(self.i1s_name,name='11')
     key1 = im.put()
     im_db = key1.get()
     assert im_db.icon_id is not None
@@ -397,8 +397,8 @@ class TestIconizedModel(unittest.TestCase):
     self.assertEqual(icon_dbs[0].key.id(),im_db.icon_id)
 
   def test_iconized_remove_icon(self):
-    im = TestIconModel(name="X",collection=self.col1)
-    im.create_icon(self.i1s_name,name='1')
+    im = TestIconModel(name="X1",collection=self.col1)
+    im.create_icon(self.i1s_name,name='i1')
     key1 = im.put()
     im_db = key1.get()
     assert im_db.icon_id is not None

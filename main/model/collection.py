@@ -16,8 +16,8 @@ from .counter import CountableLazy
 
 
 class CollectionValidator(model.BaseValidator):
-    name = [2,200]
-    description = [0,500]
+    name = [2,20]
+    description = [0,140]
 
 
 class Collection(CountableLazy, model.Base):
@@ -372,8 +372,6 @@ class CollectionUser(AddCollection, model.Base):
             if user_db.avatar_url:
                 db.user_avatar_url = user_db.avatar_url
             dbs.append(db)
-        print "[col .py] update_user"
-        print dbs
         return ndb.put_multi(dbs)
 
 
