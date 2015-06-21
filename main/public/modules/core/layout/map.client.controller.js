@@ -8,10 +8,14 @@
                     Restangular, gaToast, $timeout, $mdMedia) {
         var tilesDict
         var layers
+        
+        // True if screen is greater than md
+        $scope.screen_gt_md =  $mdMedia('gt-md'); 
+        $scope.$watch(function() { return $mdMedia('gt-md'); }, function(gt_md) {
+            $scope.screen_gt_md = gt_md;
+          });
 
-        $scope.screen_gt_md =  $mdMedia('gt-md'); // TODO add watch/update when changes
-
-
+        // Tile servers
         tilesDict = {
             thunderforestOutdoors : {
               name : "Outdoors",
@@ -67,7 +71,7 @@
             },
             swissGeoAdminMap : { // update times stamp from time to time TODO
               name : "SwissTopo",
-              url : "http://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/20151231/3857/{z}/{x}/{y}.jpeg",
+              url : 'http://wmts{s}.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/20151231/3857/{z}/{x}/{y}.jpeg',
               type : "xyz",
               layerOptions : {
                 attribution: '&copy; <a href="http://www.swisstopo.admin.ch/internet/swisstopo/en/home.html">swisstopo</a>',
@@ -85,7 +89,7 @@
         //$scope.showMap = true;
         angular.extend($scope, {
                 center: {
-                    lat: 50.095,
+                    lat: 47,
                     lng: 8.823,
                     zoom: 9
                 },
