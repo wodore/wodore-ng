@@ -32,6 +32,14 @@ class TestWayPoint(unittest.TestCase):
     self.col2a = ndb.Key('Collection','two A')
     self.col3a = ndb.Key('Collection','three A')
 
+  def tearDown(self):
+    # TODO should not be necessary!!!
+    # every new test should start fresh
+    #apiproxy_stub_map.apiproxy._APIProxyStubMap__stub_map['datastore_v3'].Clear()
+    ndb.delete_multi(model.WayPoint.query().fetch(keys_only=True))
+    ndb.delete_multi(model.Tag.query().fetch(keys_only=True))
+    ndb.delete_multi(model.TagRelation.query().fetch(keys_only=True))
+
   def test_init_waypoint(self):
     P1 = model.WayPoint(name='P1',collection=self.col1)
     P1.put()
