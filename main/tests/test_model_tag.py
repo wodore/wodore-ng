@@ -6,7 +6,7 @@ import sys
 #import logging
 import unittest
 from google.appengine.ext import ndb#, testbed
-
+from google.appengine.api import apiproxy_stub_map
 
 #from tag import Taggable, TagStructure, Tag, TagRelation
 #from icon import Icon, IconStructure
@@ -29,6 +29,15 @@ class TestTag(unittest.TestCase):
     self.child1a = ndb.Key('Collection','child1a')
     self.child2 = ndb.Key('Collection','child2')
     self.child2a = ndb.Key('Collection','child2a')
+
+  def tearDown(self):
+    # TODO should not be necessary!!!
+    # every new test should start fresh
+    #apiproxy_stub_map.apiproxy._APIProxyStubMap__stub_map['datastore_v3'].Clear()
+    ndb.delete_multi(model.Tag.query().fetch(keys_only=True))
+    ndb.delete_multi(model.TagRelation.query().fetch(keys_only=True))
+
+    #self.testbed.deactivate()
 
   def test_init_tag(self):
     tag1 = model.Tag(name='tag1')
@@ -64,6 +73,9 @@ class TestTag(unittest.TestCase):
     self.assertEqual(model.Tag.tag_to_key('two').get().count, 2)
 
   def test_add_tag_with_icon_structure(self):
+    key1 = ndb.Key('Tag', 'tag__one_global')
+    tag1_db = key1.get()
+    #print tag1_db
     icon1 = 'i'
     key1 = model.Tag.add('one', icon_data=icon1)
     tag1_db = key1.get()
@@ -154,6 +166,12 @@ class TestTagRelation(unittest.TestCase):
     self.child2 = ndb.Key('Collection','child2')
     self.child2a = ndb.Key('Collection','child2a')
 
+  def tearDown(self):
+    # TODO should not be necessary!!!
+    # every new test should start fresh
+    #apiproxy_stub_map.apiproxy._APIProxyStubMap__stub_map['datastore_v3'].Clear()
+    ndb.delete_multi(model.Tag.query().fetch(keys_only=True))
+    ndb.delete_multi(model.TagRelation.query().fetch(keys_only=True))
 
   def test_init_tag_relation(self):
     tagRel1 = model.TagRelation(tag_name='tag1',related_to='tagA')
@@ -266,7 +284,7 @@ class TestTagRelation(unittest.TestCase):
     dbs = model.TagRelation.qry(order_by_count=False).order(model.TagRelation.tag_name).fetch()
     #model.TagRelation.print_list(dbs)
     self.assertEqual(len(dbs),2*L12e+L2e)
-    self.assertEqual(dbs[0].tag_name,'a')
+    self.assertEqual(dbs[0].tag_name,'A')
     self.assertEqual(dbs[-1].tag_name,'two')
 
 
@@ -293,7 +311,6 @@ class TestTaggable(unittest.TestCase):
       """
       name = ndb.StringProperty()
 
-
     #self.icon1 = model.IconStructure(data='i1')
     #self.icon2 = model.IconStructure(data='i2')
     #self.icon3 = model.IconStructure(data='i3')
@@ -315,6 +332,14 @@ class TestTaggable(unittest.TestCase):
     self.tag3 = 'Three'
     self.tag4 = 'four'
     self.tags1 = [self.tag1,self.tag2,self.tag3, self.tag4]
+
+
+  def tearDown(self):
+    # TODO should not be necessary!!!
+    # every new test should start fresh
+    #apiproxy_stub_map.apiproxy._APIProxyStubMap__stub_map['datastore_v3'].Clear()
+    ndb.delete_multi(model.Tag.query().fetch(keys_only=True))
+    ndb.delete_multi(model.TagRelation.query().fetch(keys_only=True))
 
   def test_init_taggable(self):
     demo1 = TestTagModel(name='demo1')

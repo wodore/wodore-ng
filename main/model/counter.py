@@ -22,6 +22,7 @@ class CountableLazy(object):
 
 
     def incr(self,step=1):
+        #print "\n[counter.py model] increasy by {} to {}".format(step,self.count)
         self._incr += step
 
     def decr(self,step=1):
