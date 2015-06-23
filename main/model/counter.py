@@ -16,6 +16,10 @@ class CountableLazy(object):
 
     _incr = 0
 
+    PUBLIC_PROPERTIES = ['count']
+
+    PRIVATE_PROPERTIES = []
+
     @property
     def count(self):
         return self.cnt + self._incr
