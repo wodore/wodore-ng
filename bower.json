@@ -10,7 +10,7 @@
     "angular-ui-router": "~0.2.13",
     "lodash": "~3.4.0",
     "angular-messages": "~1.3.13",
-    "angular-material": "~0.8.1",
+    "angular-material": "~0.10",
     "angular-aria": "~1.3.14",
     "angular-no-captcha": "~0.3.0",
     "lrInfiniteScroll": "~1.0.0",
