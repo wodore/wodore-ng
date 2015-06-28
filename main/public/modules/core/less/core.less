@@ -20,12 +20,12 @@ body {
 //
 .main-content {
   background-color: @background-color !important;
-  //position: relative; 
+  position: relative; 
   //z-index: 1; /* The z-index should be higher than Google Maps */
-  //width: 80%;
-  //margin: 20px auto 0; // with border
-  // height: auto;
-  flex : 1;
+  width: 50%;
+  margin: 20px auto 0; // with border
+  height: auto;
+  //flex : 1;
 }
 
 
@@ -79,29 +79,39 @@ body {
 //  cursor: pointer;
 //}
 //
-//.sidenav-left {
-//  .sidenav-content {
-//    .md-button {
-//      padding-left: 20px;
-//      text-align: left;
-//      width: 100%;
-//      height: 60px;
-//      opacity: 1;
-//      position: relative;
-//      display: block;
-//      left: 0;
-//      &.ng-hide-add.ng-hide-add-active,
-//      &.ng-hide-remove.ng-hide-remove-active {
-//        transition: all 0.4s linear;
-//      }
-//      &.ng-hide {
-//        opacity: 0;
-//        left: -50px;
-//        height: 0;
-//      }
-//    }
-//  }
-//}
+#rightSidenav {
+    min-width : 230px;
+    max-width : 280px;
+    width : 25%;
+  }
+#leftSidenav {
+    min-width : 170px;
+    max-width : 220px;
+    width : 20%;
+  }
+.sidenav-left {
+  .sidenav-content {
+    .md-button {
+      padding-left: 10px;
+      text-align: left;
+      width: 95%;
+      height: 50px;
+      opacity: 1;
+      position: relative;
+      display: block;
+      left: 0;
+      &.ng-hide-add.ng-hide-add-active,
+      &.ng-hide-remove.ng-hide-remove-active {
+        transition: all 0.4s linear;
+      }
+      &.ng-hide {
+        opacity: 0;
+        left: -50px;
+        height: 0;
+      }
+    }
+  }
+}
 //
 //.angular-tile {
 //  background: radial-gradient(#ff0404, #B40000);

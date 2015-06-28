@@ -16,7 +16,7 @@
           </span>
           <span class="item-metadata">
             <span class="item-metastat">
-              <em>{{item.desc}}</em> 
+              <em>{{item.desc | limitTo : 25}}{{item.desc.length > 25 ? ' ...' : ''}}</em> 
             </span>
           </span>
         </md-item-template>

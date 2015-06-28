@@ -9,7 +9,7 @@
     var self = this;
 
     self.simulateQuery = false;
-    self.isDisabled    = false;
+    self.isDisabled    = true;
 
     self.repos         = loadAll();
     self.querySearch   = querySearch;

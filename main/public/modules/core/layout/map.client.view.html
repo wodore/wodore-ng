@@ -1,10 +1,25 @@
-<div data-ng-controller="BackMapController" class="background-map">
-  <leaflet width="100%" 
+<div data-ng-controller="BackMapController" class="background-map" flex layout="row">
+
+  <!--<md-sidenav md-is-locked-open="$mdMedia('gt-md')" md-component-id="leftSidenav"-->
+<md-sidenav md-component-id="leftSidenav" data-ng-controller="SidenavLeftController"
+            md-is-locked-open="SidenavLeftLocked && $mdMedia('gt-md')"
+            ng-include="'/p/modules/core/layout/sidenav_left.client.view.html'"
+            class="md-sidenav-left sidenav-left md-whiteframe-z2"
+            id="leftSidenav">
+</md-sidenav>
+
+
+  <leaflet  
           height="100%" center="center" 
           tiles="tiles" layers="layers" defaults="defaults"
-           ></leaflet>
+           flex ></leaflet>
   <!--<leaflet width="{{screen_gt_md && 'calc(100% - 304px)' || '100%'}}" 
           height="calc(100% - 64px)" center="center" 
           tiles="tiles" layers="layers" defaults="defaults"
           style="position:relative;" ></leaflet>-->
+<md-sidenav md-is-locked-open="$mdMedia('gt-sm')" md-component-id="rightSidenav"
+            ng-include="'/p/modules/core/layout/sidenav_right.client.view.html'"
+            class="sidenav-right md-sidenav-right md-whiteframe-z2"
+            id="rightSidenav">
+</md-sidenav>
 </div>
