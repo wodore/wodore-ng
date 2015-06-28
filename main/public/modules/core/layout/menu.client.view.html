@@ -1,0 +1,70 @@
+<!--<div ng-controller="TopMenuController">-->
+<md-menu md-offset="-200 62">
+    <md-button aria-label="Open menu" class="md-icon-button" ng-click="$mdOpenMenu()">
+        <md-icon md-font-icon="fa fa-ellipsis-v"></md-icon>
+      </md-button>
+    <md-menu-content width="4">
+        <md-menu-item>
+        <md-button ng-click=""> 
+                <i class="fa fa-close btn-icon"></i>
+                Close
+            </md-button>
+        </md-menu-item>
+        <md-menu-item ng-if="auth.isAdmin()">
+            <md-button ng-click="" ui-sref="admin.appConfig">
+                <i class="fa fa-gear btn-icon"></i>
+                App Config
+            </md-button>
+        </md-menu-item>
+            <md-menu-divider></md-menu-divider>
+        <md-menu-item ng-show="auth.isLogged()">
+            <md-button ng-click="" ui-sref="profile.view({username: auth.user.username})">
+                <i class="fa fa-user btn-icon"></i>
+                My Profile
+            </md-button>
+        </md-menu-item>
+        <md-menu-item ng-hide="auth.isLogged()">
+            <md-button ng-click="" ui-sref="signin">
+                <i class="fa fa-sign-in btn-icon"></i>
+                Sign In
+            </md-button>
+        </md-menu-item>
+        <md-menu-item ng-hide="auth.isLogged()">
+            <md-button ng-click="" ui-sref="signup">
+                <i class="fa fa-sign-in btn-icon"></i>
+                Sign Up
+            </md-button>
+        </md-menu-item>
+        <md-menu-item>
+            <md-button ng-click="" ui-sref="users">
+                <i class="fa fa-users btn-icon"></i>
+                Users
+            </md-button>
+        </md-menu-item>
+        <md-menu-item ng-show="cfg.has_feedback_form">
+            <md-button ng-click="" ui-sref="feedback">
+                <i class="fa fa-comment btn-icon"></i>
+                Feedback
+            </md-button>
+        </md-menu-item>
+        <md-menu-item ng-show="cfg.development">
+            <md-button  ng-click="generateDatabase()">
+                <i class="fa fa-database btn-icon"></i>
+                Generate Database
+            </md-button>
+        </md-menu-item>
+        <md-menu-item ng-show="auth.isLogged()">
+            <md-button ng-click="" ui-sref="signout" class="md-warn">
+                <i class="fa fa-sign-out btn-icon"></i>
+                Sign Out
+            </md-button>
+        </md-menu-item>
+        <md-menu-item >
+            <md-button ng-click="alert('clocked')">
+                <i class="fa fa-users btn-icon"></i>
+                DEMO
+            </md-button>
+        </md-menu-item>
+    </md-menu-content>
+</md-menu>
+<!-- </div>-->

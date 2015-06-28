@@ -10,30 +10,29 @@
 </head>
 
 <body layout="row" layout-fill>
-<md-sidenav md-is-locked-open="$mdMedia('gt-md')" md-component-id="leftSidenav"
+<!--<md-sidenav md-is-locked-open="$mdMedia('gt-md')" md-component-id="leftSidenav"
             ng-include="'/p/modules/core/layout/sidenav.client.view.html'"
             class="md-sidenav-left sidenav-left md-whiteframe-z2">
-</md-sidenav>
+</md-sidenav> -->
 <div layout="column" role="main" flex>
 
-    <md-toolbar>
-        <div ng-controller="HeaderController" ng-include="'/p/modules/core/layout/header.client.view.html'"></div>
+    <md-toolbar class="md-whiteframe-z2">
+        <div class="md-toolbar-tools" ng-controller="HeaderController" ng-include="'/p/modules/core/layout/header.client.view.html'"></div>
     </md-toolbar>
 
-   <div style="position:absolute;" 
-        layout-fill
+   <div  layout-fill
          ng-include="'/p/modules/core/layout/map.client.view.html'">
    </div>
 
-   <!-- removed flex -->
     <md-content md-scroll-y ng-hide="showMap" 
                 lr-infinite-scroll="mainContentScrolled" scroll-threshold="200"
-                class="md-padding main-content">
+                class="md-padding main-content" >
         # block content
         # endblock
         # include 'bit/footer.html'
     </md-content>
 
+   <!-- removed flex -->
 
 </div>
 # include 'bit/script.html'
