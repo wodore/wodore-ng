@@ -1,0 +1,22 @@
+<md-dialog aria-label="Mango (Fruit)" layout="column" class="w-50" layout-align="center start">
+
+    <md-dialog-content flex >
+    <leaflet center="marker_center"  markers="marker_new" height="250px" width="350px"
+          tiles="tiles" layers="layers" defaults="defaults" ></leaflet>
+
+  </md-dialog-content>
+   <div class="md-actions" layout="row">
+    <span flex></span>
+    <md-button ng-click="cancel()" class="md-primary">
+     cancel
+    </md-button>
+    <md-button ng-click="save()" class="md-primary">
+      save
+    </md-button>
+    <md-button ng-click="answer('close')" class="md-primary">
+      close
+    </md-button>
+  </div>
+
+
+</md-dialog>
