@@ -5,7 +5,7 @@
 
     module.controller('BackMapController', function($scope, $mdSidenav, 
                     gaAuthentication, gaAppConfig,
-                    Restangular, gaToast, $timeout, $mdMedia) {
+                    Restangular, gaToast, $timeout, $mdMedia, $mdDialog) {
         var tilesDict
         var layers
         
@@ -16,6 +16,7 @@
           });
 
         // Tile servers
+        if (false) { // if true --> ONLINE
         tilesDict = {
             thunderforestOutdoors : {
               name : "Outdoors",
@@ -80,6 +81,50 @@
                 minZoom: 8
                 }
             }
+          }
+        } else {
+        tilesDict = {
+            OfflineMapQuest :{
+              name: "O-MQ",
+              url :'p/tileServer/MapQuest/{z}/{x}/{y}.jpg',
+              type : "xyz",
+              options : {
+                attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+		        minZoom: 0,
+                maxZoom: 16,
+              }
+            },
+            Offline4uMaps :{
+              name: "O-4uM",
+              url :'p/tileServer/4uMaps/{z}/{x}/{y}.png',
+              type : "xyz",
+              options : {
+                attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+		        minZoom: 2,
+                maxZoom: 15,
+              }
+            },
+            OfflineHike :{
+              name: "O-Hike",
+              url :'p/tileServer/Hike/{z}/{x}/{y}.png',
+              type : "xyz",
+              options : {
+                attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+		        minZoom: 0,
+                maxZoom: 15,
+              }
+            },
+            OfflinePublic :{
+              name: "O-Public",
+              url :'p/tileServer/Public/{z}/{x}/{y}.png',
+              type : "xyz",
+              options : {
+                attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+		        minZoom: 2,
+                maxZoom: 16,
+              }
+            }
+          }
         }
 
         layers = {
@@ -89,17 +134,86 @@
         //$scope.showMap = true;
         angular.extend($scope, {
                 center: {
-                    lat: 47,
-                    lng: 8.823,
+                    lat: 46.85,
+                    lng: 10.5,
                     zoom: 9
                 },
                 defaults: {
                     scrollWheelZoom: true
                     //zoomControl : false
                 },
-                //tiles: tilesDict.thunderforestTransport,
+                //tiles: tilesDict.OfflineHike,
                 layers: layers
             });
+
+        $scope.markers = new Array();
+
+        $scope.$on("leafletDirectiveMap.click", function(event, args){
+            var leafEvent = args.leafletEvent;
+            var marker_zoom
+            if ( $scope.center.zoom < 15) {
+              marker_zoom = 15
+            } else {
+              marker_zoom = $scope.center.zoom
+            }
+            $scope.marker_center =  {
+                    lat: leafEvent.latlng.lat,
+                    lng: leafEvent.latlng.lng,
+                    zoom: marker_zoom 
+                };
+	   //$scope.tiles = tilesDict.OfflinePublic;
+           // $scope.markers.push({
+           //     lat: leafEvent.latlng.lat,
+           //     lng: leafEvent.latlng.lng,
+           //     message: "My Added Marker"
+           // });
+            $scope.marker_new = [{
+                lat: leafEvent.latlng.lat,
+                lng: leafEvent.latlng.lng,
+                draggable: true,
+            }];
+            // fix because marker is not update (bug)
+            // https://github.com/tombatossals/angular-leaflet-directive/issues/685
+            $scope.$on('leafletDirectiveMarker.dragend', function (e, args) {
+             $scope.marker_new[0].lng = args.model.lng;
+             $scope.marker_new[0].lat = args.model.lat;
+            });
+
+            $mdDialog.show({
+              controller: DialogController,
+              templateUrl: '/p/modules/core/layout/add_marker.client.view.template.html',
+              parent: angular.element(document.body),
+              targetEvent: event,
+              scope : $scope,
+              preserveScope: true
+            })
+        });
+
+        function DialogController($scope, $mdDialog) {
+          console.log($scope)
+
+          $scope.hide = function() {
+            console.log("hide")
+            $mdDialog.hide();
+          };
+          $scope.save = function() {
+            console.log($scope.marker_new)
+            $scope.marker_new[0].draggable = false
+            $scope.markers.push($scope.marker_new[0])
+            $mdDialog.hide();
+          };
+          $scope.cancel = function() {
+            console.log("cancel")
+            $mdDialog.cancel();
+          };
+          $scope.answer = function(answer) {
+            $mdDialog.hide(answer);
+            console.log(answer)
+          };
+        }
+
+
+
 
     });
 }());

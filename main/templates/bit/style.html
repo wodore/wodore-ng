@@ -3,6 +3,10 @@
 # else
     <link rel="stylesheet" href="/p/dist/style.min.css?{{config.CURRENT_VERSION_ID}}">
 # endif
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400">
     <!-- Leaflet cdn style TODO -->
- <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
+# if config.OFFLINE
+  <link rel="stylesheet" href="p/tileServer/JSlibs/leaflet/dist/leaflet.css" />
+# else
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400">
+  <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
+# endif

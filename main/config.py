@@ -6,7 +6,7 @@ import os
 from datetime import datetime
 from google.appengine.api import app_identity #pylint: disable=import-error
 
-
+OFFLINE = True
 PRODUCTION = os.environ.get('SERVER_SOFTWARE', '').startswith('Google App Eng')
 DEVELOPMENT = not PRODUCTION
 APPLICATION_ID = app_identity.get_application_id()
