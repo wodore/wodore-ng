@@ -16,7 +16,7 @@
           });
 
         // Tile servers
-        if (false) { // if true --> ONLINE
+        if (true) { // if true --> ONLINE
         tilesDict = {
             thunderforestOutdoors : {
               name : "Outdoors",
@@ -139,7 +139,9 @@
                     zoom: 9
                 },
                 defaults: {
-                    scrollWheelZoom: true
+                    scrollWheelZoom: true,
+                    doubleClickZoom: false,
+                    maxZoom : 16
                     //zoomControl : false
                 },
                 //tiles: tilesDict.OfflineHike,
@@ -148,7 +150,7 @@
 
         $scope.markers = new Array();
 
-        $scope.$on("leafletDirectiveMap.click", function(event, args){
+        $scope.$on("leafletDirectiveMap.dblclick", function(event, args){
             var leafEvent = args.leafletEvent;
             var marker_zoom
             if ( $scope.center.zoom < 15) {

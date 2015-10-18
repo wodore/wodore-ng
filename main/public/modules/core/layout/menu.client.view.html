@@ -59,10 +59,10 @@
                 Sign Out
             </md-button>
         </md-menu-item>
-        <md-menu-item >
-            <md-button ng-click="alert('clocked')">
+        <md-menu-item ng-if="auth.isAdmin()">
+            <md-button ng-click="editConfig()">
                 <i class="fa fa-users btn-icon"></i>
-                DEMO
+                Config Pop-up
             </md-button>
         </md-menu-item>
     </md-menu-content>
