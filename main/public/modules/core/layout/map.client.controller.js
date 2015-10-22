@@ -16,7 +16,7 @@
           });
 
         // Tile servers
-        if (true) { // if true --> ONLINE
+        if (false) { // if true --> ONLINE
         tilesDict = {
             thunderforestOutdoors : {
               name : "Outdoors",
