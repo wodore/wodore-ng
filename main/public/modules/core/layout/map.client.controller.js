@@ -16,14 +16,17 @@
           });
 
         // Tile servers
-        if (false) { // if true --> ONLINE
+        // TODO
+        // add:
+        // http://opentopomap.org/
+        if (true) { // if true --> ONLINE
         tilesDict = {
             thunderforestOutdoors : {
               name : "Outdoors",
               url : "http://{s}.tile.thunderforest.com/outdoors/{z}/{x}/{y}.png",
               type : "xyz",
               zindex : -1,
-              options : {
+              layerOptions : {
                 attribution: '&copy; <a href="http://www.opencyclemap.org">OpenCycleMap</a>, &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                        }
             }, 
@@ -31,7 +34,7 @@
               name : "Cycle",
               url : 'http://{s}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png',
               type : "xyz",
-              options : {
+              layerOptions : {
                 attribution: '&copy; <a href="http://www.opencyclemap.org">OpenCycleMap</a>, &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>' 
                 }
             },
@@ -39,7 +42,7 @@
               name : "Transport",
               url : 'http://{s}.tile.thunderforest.com/transport/{z}/{x}/{y}.png',
               type : "xyz",
-              options : {
+              layerOptions : {
                 attribution: '&copy; <a href="http://www.opencyclemap.org">OpenCycleMap</a>, &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>' 
                 }
             },
@@ -47,9 +50,20 @@
               name : "Hiking",
               url : 'http://maps.refuges.info/hiking/{z}/{x}/{y}.png',
               type : "xyz",
-              options: {
+              layerOptions : {
                 attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                 }
+            },
+            openTopo :{
+              name: "Open Topo",
+              url :'http://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+              type : "xyz",
+              layerOptions : {
+                attribution: 'Kartendaten: &copy <a href="https://www.openstreetmap.org/copyright">OpenStreetMap-Mitwirkende</a>, SRTM | Kartendarstellung: &copy <a href="http://opentopomap.org/">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
+                subdomains: 'abc',
+                minZoom: 1,
+                maxZoom: 14
+              }
             },
             stamenWatercolor :{
               name : "Design",
@@ -66,7 +80,7 @@
               name: "Basic",
               url :'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
               type : "xyz",
-              options : {
+              layerOptions : {
                 attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
               }
             },
@@ -88,7 +102,7 @@
               name: "O-MQ",
               url :'p/tileServer/MapQuest/{z}/{x}/{y}.jpg',
               type : "xyz",
-              options : {
+              layerOptions : {
                 attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
 		        minZoom: 0,
                 maxZoom: 16,
@@ -98,7 +112,7 @@
               name: "O-4uM",
               url :'p/tileServer/4uMaps/{z}/{x}/{y}.png',
               type : "xyz",
-              options : {
+              layerOptions : {
                 attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
 		        minZoom: 2,
                 maxZoom: 15,
@@ -108,7 +122,7 @@
               name: "O-Hike",
               url :'p/tileServer/Hike/{z}/{x}/{y}.png',
               type : "xyz",
-              options : {
+              layerOptions : {
                 attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
 		        minZoom: 0,
                 maxZoom: 15,
@@ -118,7 +132,7 @@
               name: "O-Public",
               url :'p/tileServer/Public/{z}/{x}/{y}.png',
               type : "xyz",
-              options : {
+              layerOptions : {
                 attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
 		        minZoom: 2,
                 maxZoom: 16,

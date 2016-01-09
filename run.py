@@ -38,7 +38,7 @@ ARGS = PARSER.parse_args()
 ###############################################################################
 # Globals
 ###############################################################################
-GAE_PATH = ''
+GAE_PATH = '/home/tobias/bin/google_appengine'
 IS_WINDOWS = platform.system() == 'Windows'
 
 
@@ -105,7 +105,7 @@ def create_virtualenv():
         echo_to = 'echo %s >> {pth}'.format(pth=pth_file)
         os.system(echo_to % find_gae_path())
         os.system(echo_to % os.path.abspath(DIR_LIBX))
-        fix_path_cmd = 'import dev_appserver; dev_appserver.fix_sys_path()'
+        #fix_path_cmd = 'import dev_appserver; dev_appserver.fix_sys_path()'
         os.system(echo_to % (
             fix_path_cmd if IS_WINDOWS else '"%s"' % fix_path_cmd
         ))
@@ -204,7 +204,9 @@ def find_gae_path():
         string: Absolute path of dev_appserver.py or empty string
     """
     global GAE_PATH
+    print " Google app engine path is:"+GAE_PATH
     if GAE_PATH:
+        print "Return path directly"
         return GAE_PATH
     if IS_WINDOWS:
         gae_path = None
@@ -224,6 +226,7 @@ def find_gae_path():
         gae_path = os.path.join(gae_path, '..', 'platform', 'google_appengine')
         if os.path.exists(gae_path):
             GAE_PATH = os.path.realpath(gae_path)
+    print " Google app engine path is:"+GAE_PATH
     return GAE_PATH
 
 
@@ -275,6 +278,7 @@ def run_dev_appserver():
     ] + ARGS.args
 
     run_command = ' '.join(args)
+    print "Run :"+run_command
     os.system(run_command)
 
 
