@@ -9,27 +9,19 @@
     # include 'bit/analytics.html'
 </head>
 
-<body layout="row" layout-fill>
+<body layout="row" layout-fill >
 
-<div layout="column" role="main" flex>
+<div layout="column" role="main" flex layout-fill>
 
-    <md-toolbar class="md-whiteframe-z2">
-        <div class="md-toolbar-tools" ng-controller="HeaderController" ng-include="'/p/modules/core/layout/header.client.view.html'"></div>
+    <md-toolbar id="toolbar-top" class="md-whiteframe-5dp">
+        <div class="md-toolbar-tools" ng-controller="HeaderController" ng-include="'/p/modules/core/layout/header-default.client.view.html'"></div>
     </md-toolbar>
 
-   <div  layout-fill
-         ng-include="'/p/modules/core/layout/map.client.view.html'">
-   </div>
-
-    <md-content md-scroll-y ng-hide="showMap" 
-                lr-infinite-scroll="mainContentScrolled" scroll-threshold="200"
-                class="md-padding main-content" >
-        # block content
-        # endblock
-        # include 'bit/footer.html'
-    </md-content>
-
-   <!-- removed flex -->
+    <div layout-fill flex id="content-wrapper">
+        <div  layout-fill class="content-view" ui-view="content"> </div>
+        <div  layout-fill ui-view="main"> </div>
+    </div>
+          
 
 </div>
 # include 'bit/script.html'

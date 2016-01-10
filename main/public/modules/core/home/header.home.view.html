@@ -1,0 +1,18 @@
+<div  class="md-toolbar-tools hpad-0"  >
+
+<md-button  ui-sref="map">
+<md-icon md-svg-icon="maps:map" ></md-icon>
+Map
+</md-button>
+
+<md-button  ui-sref="feedback">
+<md-icon md-svg-icon="action:feedback" ></md-icon>
+Feedback
+</md-button>
+
+<md-button   ng-if="auth.isAdmin()" ui-sref="admin.appConfig">
+<md-icon md-svg-icon="action:settings" ></md-icon>
+Admin
+</md-button>
+<div>
+

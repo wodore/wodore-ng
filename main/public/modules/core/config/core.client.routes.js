@@ -9,12 +9,29 @@
             .state('home', {
                 url         : '/',
                 controller  : 'HomeController',
-                templateUrl : '/p/modules/core/home/home.client.view.html'
+                views: {
+                    'main@' : {
+                        templateUrl : '/p/modules/core/home/welcome.client.view.html'
+                    },
+                    'content@' : {
+                        template : "<ga-content name='Demo Tester' navbar-id='toolbar-top'></ga-content>"
+                    },
+                    'header@' : {
+                        templateUrl : '/p/modules/core/home/header.home.view.html'
+                    }
+                }
             })
             .state('feedback', {
                 url         : '/feedback',
                 controller  : 'FeedbackController',
-                templateUrl : '/p/modules/core/feedback/feedback.client.view.html'
+                views: {
+                    'main@' : {
+                        templateUrl : '/p/modules/core/feedback/feedback.client.view.html'
+                    },
+                    'header@' : {
+                        templateUrl : '/p/modules/core/home/header.home.view.html'
+                    }
+                }
             });
     });
 }());

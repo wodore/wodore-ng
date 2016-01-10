@@ -1,4 +1,4 @@
-<div class="md-toolbar-tools" layout="row">
+<div class="md-toolbar-tools" id="header-toolbar">
   <!--layout="row" layout-align="space-between center" layout-align-gt-md="end">-->
 
 <!--    <md-button tabindex="-1" hide-gt-md ng-click="toggleSidenav()" aria-label="Show Menu">
@@ -6,30 +6,31 @@
     </md-button>
     -->
     <!-- LOGO/BRAND -->
-    <h1> <!-- hide-gt-md> -->
+    <div class="wodore-logo">
         <a ui-sref="home" tabindex="-1">
-
             <img src="/p/modules/core/img/logo.png" 
-                   alt="{{ cfg.brand_name }} logo" height="50">
+                   alt="{{ cfg.brand_name }} logo" height="70">
             </img>
-                   <!--<span class="f-400">{{ cfg.brand_name }}</span>-->
         </a>
-    </h1>
-    <span flex=""></span>
-    <!-- SEARCH -->
+    </div>
+
+    <span flex></span>
+    <div  class="md-toolbar-tools" ui-view="header"></div>
+<!--
+    <!- SEARCH  ->
     <div  ng-include="'/p/modules/core/layout/search_menu.client.view.html'"></div>
     <span flex=""></span>
 
-    <!-- COLLECTION -->
+    <!- COLLECTION ->
     <div  hide show ng-if="auth.isLogged()"
             ng-include="'/p/modules/core/layout/collection_menu.client.view.html'"></div>
-
+-->
     <!-- USER AVATAR -->
     <md-button hide show ng-if="auth.isLogged()" ui-sref="profile.view({username : auth.user.username})"
-       layout="row" layout-align="end center">
+       layout="row" layout-align="end center" class="md-icon-button">
        <!--<span class="mar-rig-10">{{auth.user.username}}</span>-->
         <img ng-if="auth.user" class="profile-pic" 
-              ng-src="{{auth.user.avatar_url}}&s=30"/>
+              ng-src="{{auth.user.avatar_url}}&s=50"/>
     </md-button>
 
     <!-- MENU -->

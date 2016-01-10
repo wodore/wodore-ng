@@ -63,7 +63,7 @@
         ]
     };
     var cssFiles = [
-        'lib/angular-material/angular-material.css'
+        //'lib/angular-material/angular-material.css'
     ];
     var lessPaths = [
         publicDir + '/lib/font-awesome/less'
@@ -122,6 +122,7 @@
     });
 
     gulp.task('less', function() {
+        //return gulp.src(cssFiles.concat(manifestLessFile), {
         return gulp.src(cssFiles.concat(manifestLessFile), {
             cwd : publicDir
         }).pipe(sourcemaps.init()).pipe(less({

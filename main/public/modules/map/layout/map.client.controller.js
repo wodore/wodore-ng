@@ -1,6 +1,6 @@
 (function() {
     'use strict';
-    var module = angular.module('core');
+    var module = angular.module('map');
 
 
     module.controller('BackMapController', function($scope, $mdSidenav, 
