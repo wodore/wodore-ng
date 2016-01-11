@@ -1,6 +1,7 @@
 @fa-font-path: "/p/dist/fonts";
 @background-color: #b4b4b4; //rgba(150,0,0,0.2) ;  //#edecec;
 @content-background-color: rgba(0,0,0,0.2) ;  //#edecec;
+@content-radius: 8px ;  //#edecec;
 
 //
 body {
@@ -74,18 +75,31 @@ body {
         width:100%;
         height:100%;
         //color:black;
-        text-align: center;
+        //text-align: center;
 
+        .content-border {
+            //color:black;
+            //text-align: center;
+            //padding: 0px;
+            margin : 16px;
+            max-width : 800px;
+            border-radius: @content-radius;
+            padding-bottom: 16px;
+            background-color: white;
+
+            md-toolbar {
+                border-radius: @content-radius @content-radius 0 0;
+            }
+        }
     }
 }
 
 #content-frame {
-            margin : 15px;
-            padding: 30px;
+            //margin : 0px;
+            //padding: 0px;
             max-width : 800px;
             max-height : 100%; // TODO not a good solution
-            text-align: left;
-            border-radius: 4px;
+            //text-align: left;
         }
 // collection menu
 //.colleciton-menu 

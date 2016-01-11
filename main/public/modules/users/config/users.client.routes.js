@@ -6,8 +6,12 @@
         $stateProvider
             .state('signin', {
                 url         : '/signin',
-                controller  : 'SigninController',
-                templateUrl : '/p/modules/users/auth/signin.client.view.html',
+                views : {
+                    'content@': {
+                        templateUrl : '/p/modules/users/auth/signin.client.view.html',
+                        controller  : 'SigninController'
+                    }
+                },
                 data        : {
                     signedOutOnly : true
                 }

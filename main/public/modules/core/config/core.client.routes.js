@@ -14,7 +14,7 @@
                         templateUrl : '/p/modules/core/home/welcome.client.view.html'
                     },
                     'content@' : {
-                        template : "<ga-content name='Demo Tester' navbar-id='toolbar-top'></ga-content>"
+                        templateUrl : '/p/modules/core/home/home.client.view.html'
                     },
                     'header@' : {
                         templateUrl : '/p/modules/core/home/header.home.view.html'
@@ -26,7 +26,11 @@
                 controller  : 'FeedbackController',
                 views: {
                     'main@' : {
-                        templateUrl : '/p/modules/core/feedback/feedback.client.view.html'
+                        templateUrl : '/p/modules/core/home/welcome.client.view.html'
+                    },
+                    'content@' : {
+                        templateUrl : '/p/modules/core/feedback/feedback.client.view.html',
+                        controller  : 'FeedbackController',
                     },
                     'header@' : {
                         templateUrl : '/p/modules/core/home/header.home.view.html'

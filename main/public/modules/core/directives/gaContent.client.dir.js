@@ -12,11 +12,16 @@
     module.directive('gaContent', function($window) {
         var link = function(scope, elem, attrs) {
             //scope.navbarId = false;
+            // check if name is given
+            if (scope.name) {
+                scope.showToolbar = true;
+                var additionalHeight = 130;
+            } else {
+                scope.showToolbar = false;
+                var additionalHeight = 130-64;
+            }
             if (attrs.hasOwnProperty("navbarId")) {
-                console.log("Navbar height is: ..." + attrs.navbarId)
-                console.log(angular.element(document.getElementById(attrs.navbarId)))
                 scope.navbar  = angular.element(document.getElementById(attrs.navbarId));
-                console.log(navbarHeight);
             } else {
                 var navbarHeight = 0;
                 return
@@ -36,7 +41,7 @@
                 var contentViewHeight = $window.innerHeight;
                 scope.contentView.css('height', contentViewHeight - navbarHeight + 'px');
                 scope.contentView.css('min-height', contentViewHeight - navbarHeight + 'px');
-                scope.contentFrame.css('max-height', contentViewHeight - navbarHeight - 100 + 'px');
+                scope.contentFrame.css('max-height', contentViewHeight - navbarHeight - additionalHeight + 'px');
             }
             scope.setHeight()
             //elem.css('height', '400px');
@@ -48,14 +53,13 @@
                 w :$window.innerWidth
                 };
             }, function (newValue, oldValue) {
-            console.log(newValue, oldValue);
             scope.windowHeight = newValue.h;
-            console.log("Window height changed: "+newValue.h)
             scope.setHeight()
             }, true);
             w.bind('resize', function(){
               $scope.$apply();
             })
+
 
         };
 
