@@ -2,8 +2,9 @@
     'use strict';
     var module = angular.module('core');
 
-    module.controller('FeedbackController', function($scope, Restangular, gaToast, gaAppConfig, gaAuthentication,
-                                                     gaBrowserHistory) {
+    module.controller('FeedbackController', function($scope, Restangular, 
+                                                    gaToast, gaAppConfig, 
+                                                    gaAuthentication, gaBrowserHistory) {
         var ctrl = this;
         $scope.cfg = gaAppConfig;
 
@@ -18,6 +19,8 @@
         };
 
         $scope.sendFeedback = function() {
+            console.log("Send feedback message '"+$scope.feedback+"'.");
+            console.log($scope.feedback);
             Restangular.all('feedback').post($scope.feedback).then(function() {
                 gaToast.show('Thank you for your feedback!');
                 gaBrowserHistory.back();

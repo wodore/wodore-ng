@@ -2,7 +2,6 @@
     <div flex flex-gt-md="90" flex-gt-lg="70">
             <form name="feedbackForm">
                 <md-input-container>
-                    <label>Your message</label>
                     <textarea ng-model="feedback.message"
                               name="feedback"
                               ga-input-validator
@@ -10,10 +9,28 @@
                               show-counter="true"
                               required>
                     </textarea>
+                    <label>Your message</label>
 
                     <div ng-if="feedbackForm.feedback.$dirty" ng-messages="feedbackForm.feedback.$error">
                         <div ng-message="md-maxlength">Your message is too long</div>
                         <div ng-message="required">Feedback message is required</div>
+                    </div>
+                </md-input-container>
+                <md-input-container>
+                    <label>Name</label>
+                    <textarea
+                           name="name"
+                           type="text"
+                           ng-minlength="1"
+                           md-maxlength="2000"
+                           show-counter="true"
+                           ng-model="feedback.name"
+                           rows="5"
+                           required>
+                    </textarea>
+                    <div ng-messages="feedbackForm.name.$error">
+                        <div ng-message="md-maxlength">Your message is too long</div>
+                        <div ng-message="required">Name is required</div>
                     </div>
                 </md-input-container>
                 <md-input-container>

@@ -51,7 +51,8 @@
         return {
             priority : 5000, // High priority means it will execute first
             terminal : true, //Terminal prevents compilation of any other directive on first pass
-            compile  : compile,
+            link : ERROR,
+            //compile  : compile, // TODO, does not work inside gaContent
             restrict : 'A'
         };
     });

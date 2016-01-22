@@ -23,7 +23,7 @@
             })
             .state('feedback', {
                 url         : '/feedback',
-                controller  : 'FeedbackController',
+                //controller  : 'FeedbackController',
                 views: {
                     'main@' : {
                         templateUrl : '/p/modules/core/home/welcome.client.view.html'
