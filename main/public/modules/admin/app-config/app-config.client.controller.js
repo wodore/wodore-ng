@@ -3,6 +3,7 @@
     var module = angular.module('admin');
 
     module.controller('AdminAppConfigController', function($scope, Restangular, _, gaToast, gaAppConfig) {
+//        console.log("AdminAppConfigController")
         Restangular.one('config').get().then(function(cfg) {
             $scope.cfg = cfg;
         });

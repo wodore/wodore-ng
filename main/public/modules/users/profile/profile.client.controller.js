@@ -4,6 +4,7 @@
 
     module.controller('ProfileController', function($scope, Restangular, gaAppConfig, gaAuthentication, $stateParams,
                                                     _, $mdDialog, gaToast, $state) {
+        //console.log("ProfileController")
         $scope.cfg = gaAppConfig;
         $scope.auth = gaAuthentication;
         $scope.isMyProfile = function() {
@@ -66,7 +67,7 @@
                 name   : 'Instagram'
             },
             linkedin  : {
-                domain : 'linkedin.com',
+                domain : 'linkedin.com/in',
                 name   : 'Linkedin'
             },
             github    : {

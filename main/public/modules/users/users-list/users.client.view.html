@@ -1,10 +1,11 @@
-<div layout="row" class="w-100" layout-align="center start">
-    <md-content flex flex-gt-lg="70" class="md-whiteframe-z1 no-overflow-x">
+<ga-content name='{{totalCount}} Users' navbar-id='toolbar-top'>
+<!--<div layout="row" class="w-100" layout-align="center start">-->
+<!--<md-content flex flex-gt-lg="70" class="md-whiteframe-z1 no-overflow-x">-->
 
-        <md-toolbar class="md-accent">
+        <!--<md-toolbar class="md-accent">
             <h1 class="md-toolbar-tools">Users
                 <span class="mar-lef-5" ng-show="totalCount">({{totalCount}})</span></h1>
-        </md-toolbar>
+            </md-toolbar>-->
         <md-list>
             <md-item ng-repeat="user in users" class="user-list-item">
                 <md-divider ng-if="$first"></md-divider>
@@ -30,5 +31,6 @@
             <md-progress-linear ng-show="isLoading"
                                 md-mode="indeterminate" class="pad-bot-10"></md-progress-linear>
         </md-list>
-    </md-content>
-</div>
+        <!--</md-content>-->
+    <!--</div>-->
+</ga-content>

@@ -8,12 +8,12 @@
         $stateProvider
             .state('home', {
                 url         : '/',
-                controller  : 'HomeController',
                 views: {
                     'main@' : {
                         templateUrl : '/p/modules/core/home/welcome.client.view.html'
                     },
                     'content@' : {
+                        controller  : 'HomeController',
                         templateUrl : '/p/modules/core/home/home.client.view.html'
                     },
                     'header@' : {
@@ -30,7 +30,7 @@
                     },
                     'content@' : {
                         templateUrl : '/p/modules/core/feedback/feedback.client.view.html',
-                        controller  : 'FeedbackController',
+                        controller  : 'FeedbackController'
                     },
                     'header@' : {
                         templateUrl : '/p/modules/core/home/header.home.view.html'

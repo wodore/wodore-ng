@@ -7,12 +7,12 @@
             .state('admin', {
                 url         : '/admin',
                 abstract    : true,
-                controller  : 'AdminController',
                 views: {
                     'main@' : {
                         templateUrl : '/p/modules/core/home/welcome.client.view.html'
                     },
                     'content@' : {
+                        controller  : 'AdminController',
                         templateUrl : '/p/modules/admin/layout/admin.client.view.html'
                     },
                     'header@' : {

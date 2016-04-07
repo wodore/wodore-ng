@@ -27,6 +27,7 @@
             .state('signout', {
                 url        : '/signout',
                 controller : function(Restangular, gaAuthentication, $state, gaAppConfig) {
+                    console.log('signoutController')
                     Restangular.all('auth/signout').post().then(function(appConfig) {
                         gaAuthentication.user = false;
                         _.assignDelete(gaAppConfig, appConfig);
@@ -53,10 +54,16 @@
             .state('profile', {
                 abstract : true,
                 url      : '/user/:username',
-                views    : {
-                    '' : {
+                views: {
+                    'main@' : {
+                        templateUrl : '/p/modules/core/home/welcome.client.view.html'
+                    },
+                    'content@' : {
+                        controller  : 'ProfileController',
                         templateUrl : '/p/modules/users/profile/profile.client.view.html',
-                        controller  : 'ProfileController'
+                    },
+                    'header@' : {
+                        templateUrl : '/p/modules/core/home/header.home.view.html'
                     }
                 }
             })
@@ -76,8 +83,18 @@
             })
             .state('users', {
                 url         : '/users',
-                controller  : 'UsersController',
-                templateUrl : '/p/modules/users/users-list/users.client.view.html'
+                views: {
+                    'main@' : {
+                        templateUrl : '/p/modules/core/home/welcome.client.view.html'
+                    },
+                    'content@' : {
+                        controller  : 'UsersController',
+                        templateUrl : '/p/modules/users/users-list/users.client.view.html',
+                    },
+                    'header@' : {
+                        templateUrl : '/p/modules/core/home/header.home.view.html'
+                    }
+                }
             });
     });
 }());
