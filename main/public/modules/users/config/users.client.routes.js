@@ -7,6 +7,9 @@
             .state('signin', {
                 url         : '/signin',
                 views : {
+                    'main@' : {
+                        templateUrl : '/p/modules/core/home/welcome.client.view.html',
+                    },
                     'content@': {
                         templateUrl : '/p/modules/users/auth/signin.client.view.html',
                         controller  : 'SigninController'
@@ -18,35 +21,61 @@
             })
             .state('signup', {
                 url         : '/signup',
-                controller  : 'SignupController',
-                templateUrl : '/p/modules/users/auth/signup.client.view.html',
+                views : {
+                    'main@' : {
+                        templateUrl : '/p/modules/core/home/welcome.client.view.html',
+                    },
+                    'content@': {
+                        templateUrl : '/p/modules/users/auth/signup.client.view.html',
+                        controller  : 'SignupController'
+                    }
+                },
                 data        : {
                     signedOutOnly : true
                 }
             })
             .state('signout', {
                 url        : '/signout',
-                controller : function(Restangular, gaAuthentication, $state, gaAppConfig) {
-                    console.log('signoutController')
-                    Restangular.all('auth/signout').post().then(function(appConfig) {
-                        gaAuthentication.user = false;
-                        _.assignDelete(gaAppConfig, appConfig);
-                        $state.go('home');
-                    });
+                views: {
+                    'main@' : {
+                        templateUrl : '/p/modules/core/home/welcome.client.view.html',
+                        controller : function(Restangular, gaAuthentication, $state, gaAppConfig) {
+                            console.log('signoutController')
+                            Restangular.all('auth/signout').post().then(function(appConfig) {
+                                gaAuthentication.user = false;
+                                _.assignDelete(gaAppConfig, appConfig);
+                                $state.go('home');
+                            });
+                    }
+                }
                 }
             })
             .state('forgot', {
                 url         : '/password/forgot',
-                controller  : 'ForgotController',
-                templateUrl : '/p/modules/users/auth/password/forgot.client.view.html',
+                views : {
+                    'main@' : {
+                        templateUrl : '/p/modules/core/home/welcome.client.view.html',
+                    },
+                    'content@': {
+                        templateUrl : '/p/modules/users/auth/password/forgot.client.view.html',
+                        controller  : 'ForgotController',
+                    }
+                },
                 data        : {
                     signedOutOnly : true
                 }
             })
             .state('reset', {
                 url         : '/password/reset/:token',
-                controller  : 'ResetController',
-                templateUrl : '/p/modules/users/auth/password/reset.client.view.html',
+                views : {
+                    'main@' : {
+                        templateUrl : '/p/modules/core/home/welcome.client.view.html',
+                    },
+                    'content@': {
+                        controller  : 'ResetController',
+                        templateUrl : '/p/modules/users/auth/password/reset.client.view.html',
+                    }
+                },
                 data        : {
                     signedOutOnly : true
                 }

@@ -1,11 +1,6 @@
+<ga-content name='Sign Up' navbar-id='toolbar-top'>
 <div layout="row" class="w-100" layout-align="center start">
     <div flex flex-gt-md="80" flex-gt-lg="70">
-        <md-toolbar class="md-accent">
-            <h1 class="md-toolbar-tools">Sign up</h1>
-        </md-toolbar>
-
-        <md-content class="md-padding md-whiteframe-z1">
-
             <form name="signupForm">
                 <ga-email ng-model="credentials.email" required input-tabindex="1"></ga-email>
                 <md-input-container>
@@ -50,7 +45,7 @@
                 </div>
 
             </form>
-            <ga-auth-options remember="credentials.remember"></ga-auth-options>
         </md-content>
     </div>
 </div>
+</ga-content>
