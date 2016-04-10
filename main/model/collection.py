@@ -27,12 +27,12 @@ class Collection(CountableLazy, model.Base):
     The model CollectionUser saves all user which belong to a collection.
     The propertiy 'cnt' counts the user per collection.
     If 'public' is true this means every one can see it.
-    if 'private' is true this means it is a priavate collection and no other user
+    if 'private' is true this means it is a private collection and no other user
        can be added.
     if neither, which is usually the case, user can be added to the collection.
        (it is something between ;) )
-    A collection can be inactive, it this case it can only be seen, but no changes
-       are possible anymore. (This is a cotroller task)
+    A collection can be inactive, if this is the case it can only be seen,
+       but no changes are possible anymore. (This is a cotroller task)
     """
     name = ndb.StringProperty(required=True,\
         validator=CollectionValidator.create('name'))
