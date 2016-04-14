@@ -1,0 +1,59 @@
+<ga-content name='{{collectionsLength}} Groups' navbar-id='toolbar-top'>
+
+            <!--<md-progress-linear ng-show="isLoading"
+                                md-mode="indeterminate" class="pad-bot-10"></md-progress-linear>-->
+
+                
+private
+            <md-checkbox aria-label="Private Checkbox"
+                         ng-checked="privateCheck()"
+                         md-indeterminate="privateIndeterminate()"
+                         ng-click="togglePrivate()">
+                         </md-checkbox>
+        <span> index: {{topIndex}} </span>
+        <span> total: {{totalCount}} </span>
+            <!--edit
+            <md-checkbox aria-label="Edit Checkbox"
+                         ng-model="edit" >
+                         </md-checkbox>-->
+
+ <md-switch ng-model="edit" aria-label="Edit Switch" class="md-secondary" flex>
+    edit 
+  </md-switch>
+
+
+        <md-list>
+        <md-virtual-repeat-container 
+           md-top-index="topIndex"
+           style="
+            height: 400px;
+            width: 600px; "
+            >
+          <md-list-item md-virtual-repeat="collection in Collectionss" md-on-demand
+              class="md-2-line" ui-sref="profile.view({collection: collection.key})"  ng-click="null" >
+                <!--class="user-list-item"-->
+
+<md-progress-circular ng-if="collection === null" md-mode="indeterminate" class="md-accent" md-diameter="30"></md-progress-circular>
+            <img ng-src="{{collection.avatar}}" class="md-avatar" alt="{{collection.name}}"  ng-if="collection !== null"/>
+
+          <div class="md-list-item-text">
+            <h3>{{collection.nr}} {{ collection.name }}</h3>
+            <!--<h4>{{ collection.created }}</h4>-->
+            <p>{{ collection.description | cut:true:50:' ...' }}</p>
+          </div>
+          <!--<md-checkbox class="md-secondary" ng-model="collection.private" ng-disabled="!edit" ng-if="collection != null"></md-checkbox>-->
+    <md-icon md-svg-icon="social:person"  ng-click="null" aria-label="Private" class="md-secondary md-hue-3" ng-if="collection.private === true" ></md-icon>
+    <div class="md-secondary md-hue-3" ng-if="collection.private === false" >{{collection.cnt}}</div>
+    <md-icon md-svg-icon="social:group"  ng-click="null" aria-label="Open for groups" class="md-secondary md-hue-3" ng-if="collection.private === false && ! edit" ></md-icon>
+    <md-icon md-svg-icon="social:group_add"  ng-click="null" aria-label="Add user to collection" class="md-accent md-hue-3" ng-if="collection.private === false && edit" ></md-icon>
+    <md-icon md-svg-icon="social:public"  ng-click="null" aria-label="Public" class="md-secondary md-hue-3" ng-if="collection.public === true" ></md-icon>
+
+
+    <!--
+    <md-icon class="md-secondary" ng-click="doSecondaryAction($event)" aria-label="Chat" md-svg-icon="communication:message"></md-icon>-->
+            </md-list-item>
+        </md-virtual-repeat-container>
+        </md-list>
+        <!--</md-content>-->
+    <!--</div>-->
+</ga-content>

@@ -41,6 +41,12 @@
                 Users
             </md-button>
         </md-menu-item>
+        <md-menu-item ng-if="auth.isAdmin()">
+            <md-button ng-click="" ui-sref="collections">
+                <md-icon md-font-icon="fa fa-cubes"></md-icon>
+                Groups
+            </md-button>
+        </md-menu-item>
         <md-menu-item ng-show="cfg.has_feedback_form">
             <md-button ng-click="" ui-sref="feedback">
                 <md-icon md-font-icon="fa fa-comment"></md-icon>

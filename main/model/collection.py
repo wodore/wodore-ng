@@ -13,6 +13,7 @@ import model
 #from .tag import Taggable#, TagStructure, Tag, TagRelation
 from .counter import CountableLazy
 
+from flask_restful import inputs
 
 
 class CollectionValidator(model.BaseValidator):
@@ -61,6 +62,7 @@ class Collection(CountableLazy, model.Base):
     def create_or_update_private(cls,creator_key=None, \
             creator_db=None):
         """ Creates a private collection """
+        print "Create private user collection"
         if model.CollectionUser.update_user(\
             user_db=creator_db, user_key=creator_key):
             return True
@@ -70,7 +72,8 @@ class Collection(CountableLazy, model.Base):
             return False
         else:
             creator_key = creator_db.key
-        return cls.create(name='Private {}'.format(creator_db.email),\
+        return cls.create(name='Private'.format(creator_db.email),\
+            description='Private group for {}'.format(creator_db.username),\
             creator=creator_key,public=False,\
             active=True,private=True)
 
@@ -118,11 +121,14 @@ class Collection(CountableLazy, model.Base):
                 continue
               # TODO create key with email (function in User)
             db, new = CollectionUser.get_or_create(CollectionUser.to_key_id(user_key), \
-                parent=collection_key,user=user_key,collection=collection_key, \
+                parent=collection_key,user=user_key, \
                 permission=permission, active=active, \
                 user_name = user_db.name, user_username=user_db.username,\
-                user_email=user_db.email, user_active=user_db.active,
-                user_avatar_url = user_db.avatar_url)
+                user_email=user_db.email, user_active=user_db.active, \
+                user_avatar_url = user_db.avatar_url, \
+                collection=collection_key, \
+                collection_name = db_col.name, collection_active = db_col.active, \
+                collection_private = db_col.private, collection_public = db_col.public)
             changed = False
             if not new: # make updates
                 if db.permission != permission and db.permission != 'creator':
@@ -194,28 +200,28 @@ class Collection(CountableLazy, model.Base):
         if creator:
             qry_tmp = qry
             qry = qry.filter(cls.creator==creator)
-        if active == 'both':
+        if str(active).lower() == 'both':
             pass # nothing needed
-        elif active:
+        elif inputs.boolean(active):
             qry_tmp = qry
             qry = qry.filter(cls.active==True)
-        elif not active:
+        elif not inputs.boolean(active):
             qry_tmp = qry
             qry = qry.filter(cls.active==False)
-        if public == 'both':
+        if str(public).lower() == 'both':
             pass # nothing needed
-        elif public:
+        elif inputs.boolean(public):
             qry_tmp = qry
             qry = qry.filter(cls.public==True)
-        elif not public:
+        elif not inputs.boolean(public):
             qry_tmp = qry
             qry = qry.filter(cls.public==False)
-        if private == 'both':
+        if str(private).lower() == 'both':
             pass # nothing needed
-        elif private:
+        elif inputs.boolean(private):
             qry_tmp = qry
             qry = qry.filter(cls.private==True)
-        elif not private:
+        elif not inputs.boolean(private):
             qry_tmp = qry
             qry = qry.filter(cls.private==False)
         if order_by_date == 'modified':
@@ -268,6 +274,11 @@ class Collection(CountableLazy, model.Base):
       #}
 #
     #FIELDS.update(model.Base.FIELDS)
+
+    PUBLIC_PROPERTIES = ['name', 'description', 'active', 'creator', 'public', 'private', 'cnt']
+
+    PRIVATE_PROPERTIES = []
+
 
 
 class AddCollection(ndb.Model):
@@ -349,6 +360,10 @@ class CollectionUser(AddCollection, model.Base):
     user_email = ndb.StringProperty(default='') # email of the user
     user_active = ndb.BooleanProperty(default=True) # is the user active
     user_avatar_url = ndb.StringProperty()
+    collection_name = ndb.StringProperty(required=True)
+    collection_active =  ndb.BooleanProperty(required=True,default=True)
+    collection_private = ndb.BooleanProperty(required=True,default=False)
+    collection_public =  ndb.BooleanProperty(required=True,default=False)
 
     @classmethod
     def update_user(cls, user_key=None, user_db=None):
@@ -371,6 +386,27 @@ class CollectionUser(AddCollection, model.Base):
             db.user_active = user_db.active
             if user_db.avatar_url:
                 db.user_avatar_url = user_db.avatar_url
+            dbs.append(db)
+        return ndb.put_multi(dbs)
+
+    @classmethod
+    def update_collection(cls, col_key=None, col_db=None):
+        """Updates the user_* fields if a user changed"""
+# TODO user a tasklet for this!!
+        if col_key:
+            col_db = col_key.get()
+        else:
+            col_key = col_db.key
+        if not col_db:
+            return False
+        # get all collections for this user
+        dbs = []
+        for db in cls.qry(collection=col_key):
+            db.collection_name = col_db.name
+            db.collection_name = col_db.name
+            db.collection_active = col_db.active
+            db.collection_private = col_db.private
+            db.collection_public = col_db.public
             dbs.append(db)
         return ndb.put_multi(dbs)
 
@@ -468,6 +504,9 @@ class CollectionUser(AddCollection, model.Base):
             **kwargs
           )
 
+    PUBLIC_PROPERTIES = ['user_name', 'user_username', 'user_email', 'user_active', 'user_avatar_url', 'collection_name', 'collection_active', 'collection_private', 'collection_public','permission','active']
+
+    PRIVATE_PROPERTIES = ['', '']
 
     ####FIELDS = { # parent key?
         #'user' : fields.Key,

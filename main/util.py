@@ -182,4 +182,85 @@ def create_validator(lengths=None, regex='', required=True):
 
     return validator_function
 
+###############################################################################
+# Request Parameters
+###############################################################################
+def param(name, cast=None):
+    return None
+    #value = None
+    #if flask.request.json:
+    #    return flask.request.json.get(name, None)
+
+    #if value is None:
+    #    value = flask.request.args.get(name, None)
+    #if value is None and flask.request.form:
+    #    value = flask.request.form.get(name, None)
+
+    #if cast and value is not None:
+    #    if cast is bool:
+    #        return value.lower() in ['true', 'yes', 'y', '1', '']
+    #    if cast is list:
+    #        return value.split(',') if len(value) > 0 else []
+    #    if cast is ndb.Key:
+    #        return ndb.Key(urlsafe=value)
+    #    return cast(value)
+    #return value
+
+
+
+###############################################################################
+# Model manipulations
+###############################################################################
+def get_dbs(
+    query, order=None, limit=None, cursor=None, keys_only=None, **filters
+  ):
+  limit = limit or config.DEFAULT_DB_LIMIT
+  cursor = Cursor.from_websafe_string(cursor) if cursor else None
+  model_class = ndb.Model._kind_map[query.kind]
+
+  for prop in filters:
+    if filters.get(prop, None) is None:
+      continue
+    if isinstance(filters[prop], list):
+      for value in filters[prop]:
+        query = query.filter(model_class._properties[prop] == value)
+# new custom wodor app -------------
+    elif isinstance(filters[prop], dict):
+      if filters[prop]['test'] == '>':
+        query = query.filter(model_class._properties[prop] > filters[prop]['value'])
+      elif filters[prop]['test'] == '>=':
+        query = query.filter(model_class._properties[prop] >= filters[prop]['value'])
+      elif filters[prop]['test'] == '<':
+        query = query.filter(model_class._properties[prop] < filters[prop]['value'])
+      elif filters[prop]['test'] == '<=':
+        query = query.filter(model_class._properties[prop] < filters[prop]['value'])
+      elif filters[prop]['test'] == '==':
+        query = query.filter(model_class._properties[prop] == filters[prop]['value'])
+      elif filters[prop]['test'] == '!=':
+        query = query.filter(model_class._properties[prop] != filters[prop]['value'])
+      elif filters[prop]['test'] == 'IN':
+        values = filters[prop]['value']
+        if isinstance(values, list):
+          values = filters[prop]['value']
+        else:
+           values = values.split(',')
+        query = query.filter(model_class._properties[prop].IN(values))
+        query = query.order(model_class._key)
+      query = query.order(model_class._properties[prop]) # TODO does it work?
+    else:
+      query = query.filter(model_class._properties[prop] == filters[prop])
+# ----------------------------------
+
+  if order:
+    for o in order.split(','):
+      if o.startswith('-'):
+        query = query.order(-model_class._properties[o[1:]])
+      else:
+        query = query.order(model_class._properties[o])
+  model_dbs, next_cursor, more = query.fetch_page(
+      limit, start_cursor=cursor, keys_only=keys_only,
+    )
+  next_cursor = next_cursor.to_websafe_string() if more else None
+  return list(model_dbs), next_cursor
+
 

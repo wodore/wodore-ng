@@ -4,7 +4,7 @@ from flask_restful import Resource
 from main import API
 from flask import abort
 from config import DEVELOPMENT
-from model.factories import UserFactory
+from model.factories import UserFactory, CollectionFactory
 from google.appengine.ext import ndb #pylint: disable=import-error
 from api.helpers import make_empty_ok_response
 
@@ -15,5 +15,10 @@ class GenerateDatabaseAPI(Resource):
         """Generates mock data for development purposes"""
         if not DEVELOPMENT:
             abort(404)
-        UserFactory.create_batch(50)
+        UserFactory.create_batch(30)
+        #CollectionFactory.create(30,"tburgherr@gmail.com")
+        CollectionFactory.create_private()
+        CollectionFactory.create(5,None)
+        CollectionFactory.create(40,"random", start_nr=11)
+        CollectionFactory.add_users(max_collections=20,user_min=2,user_max=10)
         return make_empty_ok_response()

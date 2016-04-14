@@ -168,3 +168,17 @@ class Base(ndb.Model):
         ent.key = key
         ent.put()
         return (ent, True)  # True meaning "created"
+
+
+
+    @classmethod
+    def get_dbs(cls, query=None, ancestor=None, order=None, limit=None, cursor=None, **kwargs):
+        return util.get_dbs(
+            query or cls.query(ancestor=ancestor),
+            limit=limit or util.param('limit', int),
+            cursor=cursor or util.param('cursor'),
+            order=order or util.param('order'),
+            **kwargs
+          )
+
+

@@ -95,6 +95,7 @@ def current_user_key():
 
 def current_user_db():
     """Convenient method to get ndb.Model instance of currently logged user"""
+    print login.current_user
     return login.current_user.user_db
 
 
@@ -178,7 +179,8 @@ def create_user_db(auth_id, name, username, email='', verified=False, password='
         password_hash=password,
         **props
     )
-    user_db.put()
+    user_key = user_db.put()
+    model.Collection.create_or_update_private(creator_key=user_key)
     task.new_user_notification(user_db)
     return user_db
 

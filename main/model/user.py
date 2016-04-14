@@ -108,4 +108,27 @@ class User(model.Base):
             return user_db
         return None
 
+    @classmethod
+    def get_by_email_or_username(cls, email_or_username):
+        """Gets user model instance by email or username"""
+        try:
+            email_or_username == User.email
+        except ValueError:
+            cond = email_or_username == User.username
+        else:
+            cond = email_or_username == User.email
+        user_db = User.query(cond).get()
+        return user_db
+
+    @classmethod
+    def get_dbs(
+              cls, admin=None, active=None, verified=None, permissions=None, **kwargs
+            ):
+        return super(User, cls).get_dbs(
+                admin=admin or util.param('admin', bool),
+                active=active or util.param('active', bool),
+                verified=verified or util.param('verified', bool),
+                permissions=permissions or util.param('permissions', list),
+                **kwargs
+              )
 

@@ -21,7 +21,7 @@
                 history = [];
                 /*jslint unparam:true*/
                 $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
-                    if (fromState.abstract || _.contains(ignoredStates, fromState.name)) {
+                    if (fromState.abstract || _.includes(ignoredStates, fromState.name)) {
                         return;
                     }
                     history.push({

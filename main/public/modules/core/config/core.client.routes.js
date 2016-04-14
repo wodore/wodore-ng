@@ -36,6 +36,21 @@
                         templateUrl : '/p/modules/core/home/header.home.view.html'
                     }
                 }
+            })
+            .state('collections', {
+                url         : '/collections',
+                views: {
+                    'main@' : {
+                        templateUrl : '/p/modules/core/home/welcome.client.view.html'
+                    },
+                    'content@' : {
+                        controller  : 'CollectionsListController',
+                        templateUrl : '/p/modules/core/collections/collections-list.client.view.html'
+                    },
+                    'header@' : {
+                        templateUrl : '/p/modules/core/home/header.home.view.html'
+                    }
+                }
             });
     });
 }());

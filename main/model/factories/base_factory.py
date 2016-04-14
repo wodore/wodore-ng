@@ -18,7 +18,7 @@ class BaseFactory(NDBFactory):
     def create_batch(cls, size, **kwargs):
         """Firstly deletes all entries from datastore and then
          creates batch of new entries"""
-        ndb.delete_multi(cls._meta.model.query().fetch(keys_only=True))
+        #ndb.delete_multi(cls._meta.model.query().fetch(keys_only=True))
         super(BaseFactory, cls).create_batch(size, **kwargs)
 
     @classmethod
