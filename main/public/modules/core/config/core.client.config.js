@@ -10,7 +10,9 @@
 
         RestangularProvider
             .setBaseUrl('/api/v1')
+//            .setParentless(true)
             .setRestangularFields({
+                selfLink: 'self.link',
                 id : 'key'
             });
 
@@ -21,9 +23,10 @@
     });
 
     module.run(function(Restangular, gaToast, $state, $rootScope, $timeout, gaFlashMessages, _,
-                        gaAuthentication, gaBrowserHistory) {
+                        gaAuthentication, gaBrowserHistory, $log) {
         var loadingPromise;
         var endLoading = function() {
+            $log.warn("LOADING: Stop Loading")
             $timeout.cancel(loadingPromise);
             $rootScope.isLoading = false;
         };
@@ -58,6 +61,10 @@
             // separately. It's mainly used to disable submit buttons, when request is sent. There's also
             // added little delay so disabling buttons looks more smoothly
             loadingPromise = $timeout(function() {
+                $log.warn("LOADING: Start Loading")
+                $log.warn("LOADING: element: ")
+                $log.warn(element)
+                $log.warn("LOADING: operation: "+operation)
                 $rootScope.isLoading = true;
             }, 500);
 

@@ -10,6 +10,12 @@ private
                          md-indeterminate="privateIndeterminate()"
                          ng-click="togglePrivate()">
                          </md-checkbox>
+all
+            <md-checkbox aria-label="Show All Checkbox"
+                         ng-checked="showAll"
+                         ng-click="toggleShowAll()">
+                         </md-checkbox>
+        <span> index: {{topIndex}} </span>
         <span> index: {{topIndex}} </span>
         <span> total: {{totalCount}} </span>
             <!--edit
@@ -29,8 +35,8 @@ private
             height: 400px;
             width: 600px; "
             >
-          <md-list-item md-virtual-repeat="collection in Collectionss" md-on-demand
-              class="md-2-line" ui-sref="profile.view({collection: collection.key})"  ng-click="null" >
+          <md-list-item md-virtual-repeat="collection in Collections" md-on-demand
+              class="md-2-line" ui-sref="collection.view({collection: collection.collection})"  ng-click="null" >
                 <!--class="user-list-item"-->
 
 <md-progress-circular ng-if="collection === null" md-mode="indeterminate" class="md-accent" md-diameter="30"></md-progress-circular>
@@ -54,6 +60,11 @@ private
             </md-list-item>
         </md-virtual-repeat-container>
         </md-list>
+
+
+    <md-button flex ui-sref="collection.edit({collection: 'add'})"
+               class="md-primary">Add New
+    </md-button>
         <!--</md-content>-->
     <!--</div>-->
 </ga-content>

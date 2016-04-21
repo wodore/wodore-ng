@@ -6,6 +6,7 @@ from model import User
 from factory.fuzzy import FuzzyText, FuzzyChoice
 import factory
 import util
+import random
 
 
 class UserFactory(BaseFactory):
@@ -14,8 +15,9 @@ class UserFactory(BaseFactory):
         model = User
 
     name = FuzzyChoice(['John Doe', 'Machete', 'Bobby Tables'])
-    username = factory.Sequence(lambda n: 'bobby%d' % n)
+    username = factory.Sequence(lambda n: '{name}{n}'.format(n=n,name=random.choice(['bobby','bob','amadus','amanda','amor','beatle','beat','zooper','3dse','3ds','2wa'])))
     email = factory.LazyAttribute(lambda user: '%s@example.com' % user.username)
+    link_to_avatar = factory.LazyAttribute(lambda user: "https://randomuser.me/api/portraits/{sex}/{nr}.jpg".format(sex=random.choice(['women','men']),nr=random.randint(1,99)))
     verified = FuzzyChoice([True, False])
     active = FuzzyChoice([True, False])
     bio = FuzzyChoice(['They see me rollin\'', 'They hatin\''])

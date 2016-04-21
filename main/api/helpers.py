@@ -160,5 +160,40 @@ class ArgumentValidator(model.BaseValidator):
             return None
         return Cursor(urlsafe=cursor)
 
+    @classmethod
+    def bool(cls, arg, default=True):
+        """Verifies if given argument is a boolean value.
+
+        Args:
+            arg (string): String with boolean value (1, true, TRUE, and so on)
+
+        Returns:
+            bool (True or False)
+
+        Do not use this directely together with ArgumentValidator.create(str),
+        use the functions below for this.
+        """
+        arg = default if arg == "" else arg
+        arg = restful.inputs.boolean(arg)
+        return arg
+
+    @classmethod
+    def boolTrue(cls, arg):
+        """ Returns True by default if the string is empty"""
+        return cls.bool(arg, True)
+
+    @classmethod
+    def boolFalse(cls, arg):
+        """ Returns False by default if the string is empty"""
+        return cls.bool(arg, False)
+
+    @classmethod
+    def tristate(cls, arg):
+        """ Tristate argument, it is either True, False or both"""
+        if str(active).lower() == 'both':
+            return 'both'
+        else:
+            return cls.bool(arg, False)
+
 
 

@@ -100,7 +100,8 @@ class CollectionFactory(BaseFactory):
         #TODO add this to a task!
         # it takes quite a long time
         #fake = Factory.create()
-        permission_list = ('none','read','write','admin','creator')
+        #permission_list = ('none','read','write','admin','creator')
+        permission_list = ('none','read','write','admin')
         user_keys = model.User.query().fetch(limit=1000, keys_only=True)
         cnt = 0
         cnt_users = 0

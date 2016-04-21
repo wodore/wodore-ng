@@ -51,6 +51,32 @@
                         templateUrl : '/p/modules/core/home/header.home.view.html'
                     }
                 }
-            });
+            })
+            .state('collection', {
+                abstract : true,
+                url      : '/collection/:collection',
+                views: {
+                    'main@' : {
+                        templateUrl : '/p/modules/core/home/welcome.client.view.html'
+                    },
+                    'content@' : {
+                        controller  : 'CollectionController',
+                        templateUrl : '/p/modules/core/collections/collection.client.view.html'
+                    },
+                    'header@' : {
+                        templateUrl : '/p/modules/core/home/header.home.view.html'
+                    }
+                }
+            })
+            .state('collection.view', {
+                url         : '',
+                templateUrl : '/p/modules/core/collections/collection-view.client.view.html'
+            })
+            .state('collection.edit', {
+                url         : '/edit',
+                controller  : 'CollectionEditController',
+                templateUrl : '/p/modules/core/collections/collection-edit.client.view.html'
+            })
+            ;
     });
 }());

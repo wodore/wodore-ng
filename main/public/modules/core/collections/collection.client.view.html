@@ -1,0 +1,16 @@
+<ga-content navbar-id='toolbar-top'>
+<div layout="row" layout-align="center start">
+    <div flex flex-gt-lg="80">
+
+        <md-content class="md-padding md-whiteframe-z1 no-overflow" layout="column" layout-align="start center">
+            <a ui-sref="collection.view({collection: collection.key})">
+                <img class="profile-pic" ng-src="{{collection.avatar}}"/>
+            </a>
+            <a ui-sref="profile.view({collection: collection.key})" class="no-dec">
+                <h2 class="mar-bot-0">{{ collection.name }}</h2>
+            </a>
+            <div class="profile-view w-100" ui-view></div>
+        </md-content>
+    </div>
+</div>
+</ga-content>

@@ -8,8 +8,12 @@ import re
 from google.appengine.ext import ndb #pylint: disable=import-error
 import config
 from pydash import _
+import itertools, operator
 
 EMAIL_REGEX = r'^[-!#$%&\'*+\\.\/0-9=?A-Za-z^_`{|}~]+@([-0-9A-Za-z]+\.)+([0-9A-Za-z]){2,4}$'
+
+# see: https://gist.github.com/dperini/729294 (PYTHON PORT)
+URL_REGEX = r'^(?:(?:https?|ftp)://)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:/\S*)?$'
 
 
 def uuid():
@@ -262,5 +266,14 @@ def get_dbs(
     )
   next_cursor = next_cursor.to_websafe_string() if more else None
   return list(model_dbs), next_cursor
+
+
+
+def sort_uniq(sequence,key_sort=None,key_group=None,reverse=False):
+    sorted_seq = list(sorted(sequence,key=operator.itemgetter(key_sort), reverse=reverse))
+    #return sorted_seq
+    uniq_seq = {v[key_group]:v for v in sorted_seq}.values()
+    return list(sorted(uniq_seq,key=operator.itemgetter(key_sort), reverse=not reverse))
+
 
 

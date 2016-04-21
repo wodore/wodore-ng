@@ -104,8 +104,11 @@ class Base(ndb.Model):
             if isinstance(attr, date):
                 repr_dict[name] = attr.isoformat()
             elif isinstance(attr, ndb.Key):
-                repr_dict[name] = self.key.urlsafe()
-                repr_dict['id'] = self.key.id()
+                if name == 'key':
+                    repr_dict[name] = self.key.urlsafe()
+                    repr_dict['id'] = self.key.id()
+                else:
+                    repr_dict[name] = attr.urlsafe();
             else:
                 repr_dict[name] = attr
 
@@ -181,4 +184,9 @@ class Base(ndb.Model):
             **kwargs
           )
 
-
+    def __getitem__(self, key):
+        #self._validateKey(key)
+        try:
+            return getattr(self, key)
+        except AttributeError:
+            raise KeyError("%s not found on DictionaryProperty value" % key)

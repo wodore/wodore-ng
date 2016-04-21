@@ -15,10 +15,10 @@ class GenerateDatabaseAPI(Resource):
         """Generates mock data for development purposes"""
         if not DEVELOPMENT:
             abort(404)
-        UserFactory.create_batch(30)
+        UserFactory.create_batch(40)
         #CollectionFactory.create(30,"tburgherr@gmail.com")
         CollectionFactory.create_private()
         CollectionFactory.create(5,None)
-        CollectionFactory.create(40,"random", start_nr=11)
-        CollectionFactory.add_users(max_collections=20,user_min=2,user_max=10)
+        CollectionFactory.create(60,"random", start_nr=6)
+        CollectionFactory.add_users(max_collections=50,user_min=2,user_max=15)
         return make_empty_ok_response()

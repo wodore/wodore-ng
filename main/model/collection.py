@@ -79,8 +79,22 @@ class Collection(CountableLazy, model.Base):
 
 
     @classmethod
+    def create_or_update(cls,key=None,**kwargs):
+        """ Updates a collection or creates a new one """
+        if key:
+            db = key.get()
+            db.populate(**kwargs)
+            db.put()
+            CollectionUser.update_collection(col_db=db)
+            return db.key
+        else:
+            print "Arguments for create"
+            print kwargs
+            return cls.create(**kwargs)
+
+    @classmethod
     def create(cls,name,creator,description=None,public=False,\
-          private=False, active=True,):
+          private=False, active=True):
         """ Creates and puts a new collection to the database.
         The property creator is mandatory, it is best to given the current logged
         in user with: auth.current_user_key()
@@ -99,36 +113,52 @@ class Collection(CountableLazy, model.Base):
         return col_key
 
     @classmethod
-    def add_users(cls,collection_key,user_key_list,permission='read',active=True):
+    def add_users(cls,collection_key,user_key_list,permission='read',active=True,urlsafe=False):
         """Add users to a collection.
 
         The default permission is 'read'.
         If the permission is different per user the user list needs to have the
         following form:
         user_key_list=[[key1,permission1],[key2,permission2],...]
+            or
+        user_key_list=[{Key:key1,permission:permission1},,...]
+
         and persmission=False!
 
         This function can also be used to update a user (for example permission)
         """
         multi_permissions = not permission
+        if urlsafe:
+            collection_key = ndb.Key(urlsafe=collection_key)
         db_col = collection_key.get()
         for user_key in user_key_list:
             if multi_permissions:
-                permission = user_key[1]
-                user_key = user_key[0]
+                try:
+                    permission = user_key[1]
+                except:
+                    permission = user_key['permission']
+                try:
+                    user_key = user_key[0]
+                except:
+                    user_key = user_key['key']
+            if urlsafe:
+                user_key = ndb.Key(urlsafe=user_key)
             user_db = user_key.get()
             if not user_db:
                 continue
               # TODO create key with email (function in User)
             db, new = CollectionUser.get_or_create(CollectionUser.to_key_id(user_key), \
                 parent=collection_key,user=user_key, \
-                permission=permission, active=active, \
+                permission=permission, user_collection_active=active, \
                 user_name = user_db.name, user_username=user_db.username,\
                 user_email=user_db.email, user_active=user_db.active, \
                 user_avatar_url = user_db.avatar_url, \
                 collection=collection_key, \
-                collection_name = db_col.name, collection_active = db_col.active, \
-                collection_private = db_col.private, collection_public = db_col.public)
+                name = db_col.name, \
+                description = db_col.description, \
+                active = db_col.active, \
+                private = db_col.private, \
+                public = db_col.public)
             changed = False
             if not new: # make updates
                 if db.permission != permission and db.permission != 'creator':
@@ -146,13 +176,17 @@ class Collection(CountableLazy, model.Base):
         db_col.put()
 
     @classmethod
-    def remove_users(cls,collection_key,user_key_list):
+    def remove_users(cls,collection_key,user_key_list,urlsafe=False):
         """Remove users from a collection.
         """
+        if urlsafe:
+            collection_key = ndb.Key(urlsafe=collection_key)
         db_col = collection_key.get()
         keys = []
         keys_checked = []
         for user_key in user_key_list:
+            if urlsafe:
+                user_key = ndb.Key(urlsafe=user_key)
             keys.append(CollectionUser.to_key(collection_key, user_key))
         dbs_to_check = ndb.get_multi(keys)
         for db in dbs_to_check:
@@ -164,7 +198,7 @@ class Collection(CountableLazy, model.Base):
 
     @classmethod
     def has_permission(cls,collection_key,user_key,\
-        permission=None, equal=False):
+        permission=None, equal=False, urlsafe=False):
         """Checks if a user has a certain permission for a collection.
 
         Possible permissions are: 'creator', 'admin, 'write', 'read', 'none'.
@@ -173,6 +207,9 @@ class Collection(CountableLazy, model.Base):
         If the flag equal=True then the permission must be equal ('admin' != 'write')
         If permission=None it returns the current permission
         """
+        if urlsafe:
+            collection_key = ndb.Key(urlsafe=collection_key)
+            user_key = ndb.Key(urlsafe=user_key)
         db_col = CollectionUser.to_key(collection_key, user_key).get()
         if not db_col:
             return  'none'
@@ -352,7 +389,7 @@ class CollectionUser(AddCollection, model.Base):
     """
      # collection should be the same as 'parent'
     user = ndb.KeyProperty(kind="User",required=True) # default: current user key
-    active = ndb.BooleanProperty(required=True,default=True)
+    user_collection_active = ndb.BooleanProperty(required=True,default=True)
     permission = ndb.StringProperty(required=True,
         choices=['creator', 'admin','write','read','none'], default='read')
     user_name = ndb.StringProperty(required=True) # name property of User
@@ -360,10 +397,11 @@ class CollectionUser(AddCollection, model.Base):
     user_email = ndb.StringProperty(default='') # email of the user
     user_active = ndb.BooleanProperty(default=True) # is the user active
     user_avatar_url = ndb.StringProperty()
-    collection_name = ndb.StringProperty(required=True)
-    collection_active =  ndb.BooleanProperty(required=True,default=True)
-    collection_private = ndb.BooleanProperty(required=True,default=False)
-    collection_public =  ndb.BooleanProperty(required=True,default=False)
+    name = ndb.StringProperty(required=True)
+    description = ndb.TextProperty(required=True,default='')
+    active =  ndb.BooleanProperty(required=True,default=True)
+    private = ndb.BooleanProperty(required=True,default=False)
+    public =  ndb.BooleanProperty(required=True,default=False)
 
     @classmethod
     def update_user(cls, user_key=None, user_db=None):
@@ -402,11 +440,12 @@ class CollectionUser(AddCollection, model.Base):
         # get all collections for this user
         dbs = []
         for db in cls.qry(collection=col_key):
-            db.collection_name = col_db.name
-            db.collection_name = col_db.name
-            db.collection_active = col_db.active
-            db.collection_private = col_db.private
-            db.collection_public = col_db.public
+            #print db
+            db.name = col_db.name
+            db.description = col_db.description
+            db.active = col_db.active
+            db.private = col_db.private
+            db.public = col_db.public
             dbs.append(db)
         return ndb.put_multi(dbs)
 
@@ -434,25 +473,28 @@ class CollectionUser(AddCollection, model.Base):
             parent=collection_key)
 
     @classmethod
-    def qry(cls, user=None, collection=None, active=True, permission=None, \
+    def qry(cls, user=None, collection=None, user_collection_active=True, permission=None, \
         user_email=None,
         order_by_date='modified', **kwargs):
         """Query for collections, if active='both' it is not queried for active."""
-        qry = cls.query(**kwargs)
+        if collection:
+            qry = cls.query(ancestor=collection,**kwargs)
+        else:
+            qry = cls.query(**kwargs)
         if user:
             qry_tmp = qry
             qry = qry.filter(cls.user==user)
-        if collection:
-            qry_tmp = qry
-            qry = qry.filter(cls.parent==collection)
-        if active == 'both':
+        #if collection:
+            #qry_tmp = qry
+            #qry = qry.ancestor(collection)
+        if user_collection_active == 'both':
             pass # nothing needed
-        elif active:
+        elif user_collection_active:
             qry_tmp = qry
-            qry = qry.filter(cls.active==True)
-        elif not active:
+            qry = qry.filter(cls.user_collection_active==True)
+        elif not user_collection_active:
             qry_tmp = qry
-            qry = qry.filter(cls.active==False)
+            qry = qry.filter(cls.user_collection_active==False)
         if permission:
             qry_tmp = qry
             qry = qry.filter(cls.permission==permission)
@@ -474,13 +516,13 @@ class CollectionUser(AddCollection, model.Base):
         print "\n+-----------------------------+-----------------------------+-------------------+"\
             +"-------------------+-------------------+-------------------+"
         print "| {:<28}| {:<28}| {:<18}| {:<18}| {:<18}| {:<18}|".\
-            format("parent (collection)", "user", "active","permission","...", "...", )
+            format("parent (collection)", "user", "user_collection_active","permission","...", "...", )
         print "+-----------------------------+-----------------------------+-------------------+"\
             +"-------------------+-------------------+-------------------+"
         for db in dbs:
             print "| {:<28}| {:<28}| {:<18}| {:<18}| {:<18}| {:<18}|".\
               format(db.key.parent() or None, db.user_name, \
-                    db.active, db.permission,"","")
+                    db.user_collection_active, db.permission,"","")
         print "+-----------------------------+-----------------------------+-------------------+"\
             +"-------------------+-------------------+-------------------+"
         print
@@ -488,14 +530,14 @@ class CollectionUser(AddCollection, model.Base):
 
     @classmethod
     def get_dbs(
-        cls, user=None, active=None, permission=None,
+        cls, user=None, user_collection_active=None, permission=None,
         user_name=None, user_username=None, user_email=None,\
         user_active=None, **kwargs
               ):
         kwargs = cls.get_col_dbs(**kwargs)
         return super(CollectionUser, cls).get_dbs(
             user=user or util.param('user', ndb.Key),
-            active=active or util.param('active', bool),
+            user_collection_active=user_collection_active or util.param('user_collection_active', bool),
             permission=permission or util.param('permission', str),
             user_name=user_name or util.param('user_name', str),
             user_username=user_username or util.param('user_username', str),
@@ -504,7 +546,7 @@ class CollectionUser(AddCollection, model.Base):
             **kwargs
           )
 
-    PUBLIC_PROPERTIES = ['user_name', 'user_username', 'user_email', 'user_active', 'user_avatar_url', 'collection_name', 'collection_active', 'collection_private', 'collection_public','permission','active']
+    PUBLIC_PROPERTIES = ['user_collection_active', 'user_name', 'user_username', 'user_email', 'user_active', 'user_avatar_url', 'name', 'description', 'private', 'public','permission','active','collection','user']
 
     PRIVATE_PROPERTIES = ['', '']
 

@@ -1,0 +1,60 @@
+<div ng-show="collection" layout="column" layout-align="start center">
+    <!--
+    <h3 class="vmar-5" ng-if="collection.description">{{ collection.description }}</h3>-->
+    <h4 class="mar-top-5 text-center" ng-if="collection.description">{{ collection.description }}</h4>
+    <div class="vmar-10" ng-if="collection.permission">
+            <i class="fa fa-rocket"></i> {{ collection.permission }}
+    </div>
+
+    <div class="vmar-10" ng-if="auth.isAdmin()">
+        <div class="mar-bot-5">Created: {{collection.created | date:'medium'}}</div>
+        <div>Modified: {{collection.modified | date:'medium'}}</div>
+        <div layout="row" layout-align="center center" class="mar-top-15">
+            <div ng-show="collection.verified" class="hpad-15">
+                <md-icon md-font-icon="fa fa-check"></md-icon>
+                <md-tooltip>Verified</md-tooltip>
+            </div>
+            <div ng-hide="collection.active" class="hpad-15">
+                <md-icon md-font-icon="fa fa-ban"></md-icon>
+                <md-tooltip>Blocked</md-tooltip>
+            </div>
+            <div ng-show="collection.admin" class="hpad-15">
+                <md-icon md-font-icon="fa fa-user"></md-icon>
+                <md-tooltip>Admin</md-tooltip>
+            </div>
+        </div>
+    </div>
+    <!--<md-contact-chips
+        ng-model="users"
+        md-contact-name="user_username"
+        md-contact-image="user_avatar_url"
+        md-contact-email="user_email"
+        readonly="true"
+        md-highlight-flags="i"
+        placeholder="To">
+    </md-contact-chips>-->
+     <md-chips flex class="md-contact-chips" ng-model="users" readonly="true">
+                            <md-chip-template>
+                                <div class="md-contact-avatar">
+                                    <img ng-src="{{$chip.user_avatar_url}}" alt="{{$chip.user_username}}" ng-if="$chip.user_avatar_url" />
+                                </div>
+                                <div class="md-contact-name">
+                                    {{$chip.user_username}}
+                                    <md-icon md-svg-icon="{{permIcons[$chip.permission]}}" aria-label="{{$chip.permission}}" class="md-secondary md-hue-3" ng-if="$chip.permission" ></md-icon>
+                                    <!--<small>{{$chip.permission}}</small>-->
+                                </div>
+                            </md-chip-template>
+</md-chips>
+</div>
+<div ng-if="collection.permission === 'write' || collection.permission === 'admin' || collection.permission === 'creator'" layout="row" layout-margin>
+    <md-button flex class="md-warn"
+               ng-if="auth.isAdmin()"
+               ng-click="showDeleteUserDialog($event)">delete
+    </md-button>
+    <md-button flex ui-sref="collection.edit({collection: collection.key})"
+               class="md-primary">Edit
+    </md-button>
+    <md-button flex ui-sref="collection.edit({collection: 'add'})"
+               class="md-primary">Add New
+    </md-button>
+</div>

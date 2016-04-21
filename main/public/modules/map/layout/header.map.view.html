@@ -1,4 +1,4 @@
-<div  class="md-toolbar-tools hpad-0" ng-controller="MapHeaderController"  >
+<div  class="md-toolbar-tools hpad-0" ng-controller="MapHeaderController as ctrl"  >
 
     <!--<md-input-container class="">-->
         <md-button class="md-icon-button" aria-label="search"
@@ -13,28 +13,38 @@
         </div>
         <!--</md-input-container>-->
 
-    <div class="md-toolbar-tools hpad-0" ng-hide="search" ng-controller="CollectionMenuController as ctrl" class="collection-menu" flex>
+    <div class="md-toolbar-tools hpad-0" ng-hide="search"  class="collection-menu" flex>
         <form ng-submit="$event.preventDefault()" layout="row">
             <md-button class="md-fab md-mini" aria-label="Add Collection">
                 <i class="fa fa-plus btn-icon"></i>
             </md-button>
-          <md-autocomplete ng-disabled="ctrl.isDisabled" md-no-cache="ctrl.noCache" md-selected-item="ctrl.selectedItem" md-search-text-change="ctrl.searchTextChange(ctrl.searchText)" md-search-text="ctrl.searchText" md-selected-item-change="ctrl.selectedItemChange(item)" md-items="item in ctrl.querySearch(ctrl.searchText)" md-item-text="item.name" md-min-length="0" placeholder="Choose a group" md-menu-class="autocomplete-collection-template" autofocus="false">
-            <md-item-template>
-              <span class="item-title">
-                <i class="fa fa-{{item.icon}} btn-icon"></i>
-                <span> <strong> {{item.name}} </strong></span>
-                <span class="item-metastat">
-                  {{item.members}} members
-                </span>
-              </span>
-              <span class="item-metadata">
-                <span class="item-metastat">
-                  <em>{{item.desc | limitTo : 25}}{{item.desc.length > 25 ? ' ...' : ''}}</em> 
-                </span>
-              </span>
-            </md-item-template>
-          </md-autocomplete>
-        </form>
+      <md-autocomplete
+          ng-disabled="ctrl.isDisabled"
+          md-no-cache="ctrl.noCache"
+          md-selected-item="ctrl.selectedItem"
+          md-search-text-change="ctrl.searchTextChange(ctrl.searchText)"
+          md-search-text="ctrl.searchText"
+          md-selected-item-change="ctrl.selectedItemChange(item)"
+          md-items="item in ctrl.querySearch(ctrl.searchText)"
+          md-item-text="item.name"
+          md-min-length="0"
+          placeholder="Pick an Angular repository"
+          md-menu-class="autocomplete-custom-template">
+        <md-item-template>
+          <span class="item-title">
+              <!-- <md-icon md-svg-icon="img/icons/octicon-repo.svg"></md-icon>-->
+            <img ng-src="{{item.avatar}}" class="md-avatar" alt="{{item.name}}" style="width:30px;" />
+            <strong> {{item.name}} </strong>
+          </span>
+          <br>
+          <span class="item-metadata">
+            <span class="item-metastat">
+              <span>{{item.description}}</span> watchers
+            </span>
+          </span>
+        </md-item-template>
+      </md-autocomplete>
+
     </div>
 <div>
 

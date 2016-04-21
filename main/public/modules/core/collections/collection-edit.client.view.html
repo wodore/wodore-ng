@@ -1,0 +1,98 @@
+<form name="collectionEditForm">
+    <md-input-container>
+        <label>Name</label>
+        <input ng-model="editCol.name"
+               type="text"
+               ga-input-validator
+               validator-category="collection"
+               tabindex="1"
+               name="name">
+
+        <div ng-if="collectionEditForm.name.$dirty" ng-messages="collectionEditForm.name.$error">
+            <div ng-message="maxlength">Name is too long</div>
+        </div>
+    </md-input-container>
+    <md-input-container>
+        <label>Description</label>
+        <input ng-model="editCol.description"
+               name="Description"
+               ga-input-validator
+               validator-category="collection"
+               show-counter="true"
+               tabindex="3">
+    </md-input-container>
+     <div ng-if="auth.isAdmin()">
+        <md-checkbox ng-model="editCol.private">
+            Private
+        </md-checkbox>
+        <md-checkbox ng-model="editCol.active">
+            Active
+        </md-checkbox>
+        <md-checkbox ng-model="editCol.public">
+            Public
+        </md-checkbox>
+    </div>
+
+     <md-chips flex class="md-contact-chips"
+        ng-model="users"
+        md-contacts="delayedQuerySearch($query)"
+        md-contact-name="user_username"
+        md-contact-image="user_avatar_url"
+        md-contact-email="user_email"
+        md-require-match="false"
+        md-highlight-flags="i"
+        filter-selected="ctrl.filterSelected"
+        md-separator-keys="customKeys"
+        placeholder="To">
+                            <md-chip-template>
+                                <div class="md-contact-avatar">
+                                    <img ng-src="{{$chip.user_avatar_url}}" alt="{{$chip.user_username}}" ng-if="$chip.user_avatar_url" />
+                                </div>
+                                <div class="md-contact-name">
+                                    {{$chip.user_username}}
+                                    <!--<md-icon md-svg-icon="{{permIcons[$chip.permission]}}" aria-label="{{$chip.permission}}" class="md-secondary md-hue-3" ng-if="$chip.permission" ></md-icon>-->
+                                    <md-select ng-model="$chip.permission" style="display: inherit; margin: 0; width: 25px;" md-selected-text="returnIcon($chip.permission)" ng-if="$chip.permission !== 'creator'" >
+    <md-select-header>
+      <small> Permission </small>
+    </md-select-header>
+          <md-option ng-repeat="state in ['none','read','write','admin']" value="{{state}}">
+          <md-icon md-svg-icon='{{permIcons[state]}}' aria-label="{{$chip.permission}}" class="md-secondary md-hue-3" ng-if="$chip.permission" ></md-icon> <small>{{state}}</small>
+          </md-option>
+        </md-select>
+
+          <md-icon md-svg-icon='{{permIcons[$chip.permission]}}' aria-label="{{$chip.permission}}" class="md-secondary md-hue-3" ng-if="$chip.permission"  ng-if="$chip.permission === 'creator'"></md-icon>
+
+                                    <!--<small>{{$chip.permission}}</small>-->
+                                </div>
+                            </md-chip-template>
+<button md-chip-remove class="_md-chip-remove" ng-if="$chip.permission !== 'creator'" >
+        <md-icon md-svg-icon="md-close"></md-icon>
+      </button>
+</md-chips>
+
+    <md-contact-chips
+        ng-model="users"
+        md-contacts="delayedQuerySearch($query)"
+        md-contact-name="user_username"
+        md-contact-image="user_avatar_url"
+        md-contact-email="user_email"
+        md-require-match="false"
+        md-highlight-flags="i"
+        filter-selected="ctrl.filterSelected"
+        md-separator-keys="customKeys"
+        placeholder="To">
+    </md-contact-chips>
+
+
+    <div layout="row" layout-margin>
+        <md-button flex ui-sref="collection.view({collection: collection.key})">Cancel</md-button>
+        <md-button flex
+                   ng-click="save()"
+                   ng-disabled="!collectionEditForm.$valid || !collectionEditForm.$dirty"
+                   type="submit"
+                   tabindex="11"
+                   class="md-warning">Save</md-button>
+    </div>
+    isLoading is {{isLoading}} (should be used for ng-diabled
+
+</form>
