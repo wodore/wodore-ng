@@ -17,6 +17,10 @@ class TestTag(unittest.TestCase):
   # enable the datastore stub
   nosegae_datastore_v3 = True
   nosegae_memcache = True
+  nosegae_blobstore = True
+  nosegae_app_identity_service = True
+  nosegae_urlfetch = True
+  nosegae_images = True
 
   def setUp(self):
     global config
@@ -293,6 +297,10 @@ class TestTaggable(unittest.TestCase):
   # enable the datastore stub
   nosegae_datastore_v3 = True
   nosegae_memcache = True
+  nosegae_blobstore = True
+  #nosegae_app_identity_service = True
+  nosegae_urlfetch = True
+  nosegae_images = True
 
   def setUp(self):
     global config

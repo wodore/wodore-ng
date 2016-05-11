@@ -28,6 +28,8 @@
     self.repos         = [];//loadAll();
     wdCollections.load(30).then(function(){
         self.repos = loadAll()
+        $scope.collections = wdCollections.get_list();
+        $scope.collection = $scope.collections[0]
     });
     self.querySearch   = querySearch;
     self.selectedItemChange = selectedItemChange;
@@ -107,6 +109,7 @@
         return (item.value.indexOf(lowercaseQuery) >= 0);
       };
     }
+
 
 
     });

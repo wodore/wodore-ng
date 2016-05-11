@@ -11,6 +11,10 @@ from .counter import CountableLazy
 from .collection import Collection, AddCollection
 import config
 
+import cloudstorage as gcs
+
+from google.appengine.api import images
+from google.appengine.ext import blobstore
 """
 An icon consists of two model classes:
   IconStructure: Which helds all icon specific data but no additional information.
@@ -32,6 +36,7 @@ class Icon(CountableLazy, AddCollection, model.Base):
           validator=IconValidator.create('name'))
     #icon = ndb.StructuredProperty(IconStructure)
     icon = ndb.BlobProperty(required=True)
+    icon_url = ndb.StringProperty(required=True,default="",indexed=False)
     private = ndb.BooleanProperty(required=True,default=False) # not shown for others
                          # private means inside its collection
     replaced_by = ndb.KeyProperty(kind='Icon') # if the icon should not be used anymore
@@ -49,7 +54,7 @@ class Icon(CountableLazy, AddCollection, model.Base):
     keywords = ndb.StringProperty(indexed=True,repeated=True)
 
     @classmethod
-    def create(cls,icon,name,collection=Collection.top_key(),\
+    def create(cls,icon,name,icon_url=None,collection=Collection.top_key(),\
         toplevel=None, private=False, author_html=None,\
         fallback=None, external_source=None, \
         filetype=None, keywords=None, comment=None, auto=True):
@@ -60,7 +65,8 @@ class Icon(CountableLazy, AddCollection, model.Base):
       new_icon = Icon(icon = icon,
           name=name,
           collection=collection,
-          private=private)
+          private=private,
+          icon_url=icon_url)
       if toplevel:
           new_icon.toplevel = toplevel
       if fallback:
@@ -75,7 +81,26 @@ class Icon(CountableLazy, AddCollection, model.Base):
           new_icon.comment = comment
       if keywords:
 # TODO check keywords (tag validator) and make list unique
-          new_icon.keywords = keywords
+          new_icon.keywords = model.TagValidator.name(keywords)
+
+      # SAVE TO CLOUD STORAGE
+      adr =  "{}/{}/{}/{}".format(config.BUCKET, collection.urlsafe(), 'icons', name)
+      write_retry_params = gcs.RetryParams(backoff_factor=1.1)
+      gcs_file = gcs.open(adr, 'w',
+        content_type="image/svg+xml",
+        options={
+          'x-goog-meta-name': name
+              },
+        retry_params=write_retry_params)
+      gcs_file.write(icon) # saves file to cloud storage
+      gcs_file.close()
+      blob_key = blobstore.create_gs_key('/gs' + adr)
+      img_url = images.get_serving_url(blob_key=blob_key)
+      if not icon_url:
+          new_icon.icon_url = img_url
+      if not external_source:
+          new_icon.external_source = img_url
+
       key = new_icon._add_and_put(auto=auto)
       return key
 
@@ -90,7 +115,7 @@ class Icon(CountableLazy, AddCollection, model.Base):
 
         1. If the key's collection is Collection.top_key() (no toplevel) or 'as_child' is true:
            The key is assigned as toplevel.
-           ('as_child' means the icon is added with key as toplevel)
+           ('as_child' means the icon is added with 'key' as 'toplevel')
 
         2. It is not a toplevel key:
            The property 'toplevel' is assigned as key.
@@ -206,7 +231,7 @@ class Icon(CountableLazy, AddCollection, model.Base):
             #top = Icon(icon=self.icon,name=self.name)
 
             top = Icon(icon=self.icon,name=self.name,\
-                       private=False,  \
+                       private=False,  icon_url=self.icon_url, \
                        external_source=self.external_source, \
                        filetype=self.filetype, keywords=self.keywords)
             if getattr(self,'fallback',None) : # TODO test fallbacks
@@ -239,6 +264,7 @@ class Iconize(ndb.Model):
       """
     #icon = ndb.StructuredProperty(IconStructure)
     icon_id = ndb.IntegerProperty(indexed=True,required=True, default=0)
+    icon_url = ndb.StringProperty(required=True,default="",indexed=False)
 
     def add_icon(self, key=None, id=None):
         """Adds an icon by key or id, the key is either a toplevel key or an icon key.
@@ -256,6 +282,7 @@ class Iconize(ndb.Model):
         key = Icon.add(key,collection=col)
         #self.icon = key.get().get_icon()
         self.icon_id = key.id()
+        self.icon_url = key.get().icon_url
 
     def create_icon(self,icon,name,private=False):
         if not getattr(self,'collection',None):
@@ -266,11 +293,13 @@ class Iconize(ndb.Model):
         #icon.icon_key = key
         #self.icon = icon
         self.icon_id = key.id()
+        self.icon_url = key.get().icon_url
 
     def remove_icon(self):
         if getattr(self,'icon_id',None):
             Icon.remove(self.icon_id)
         self.icon_id = 0
+        self.icon_url = ""
 
 ## TODO write test
 # shuld not be used anymore, replaced by get_icon_id

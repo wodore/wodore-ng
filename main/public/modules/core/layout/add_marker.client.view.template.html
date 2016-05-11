@@ -1,22 +1,87 @@
-<md-dialog aria-label="Mango (Fruit)" layout="column" class="w-50" layout-align="center start">
+<md-dialog aria-label="Mango (Fruit)" layout="column" class="w-50"
+style="max-width:900px;width:700px;">
 
-    <md-dialog-content flex >
-    <leaflet center="marker_center"  markers="marker_new" height="250px" width="350px"
-          tiles="tiles" layers="layers" defaults="defaults" ></leaflet>
+<md-dialog-content layout-fill style="background:blue;">
 
-  </md-dialog-content>
-   <div class="md-actions" layout="row">
+<!-- text inputs and map -->
+<div layout style="background:red;">
+    <div layout="row" layout-xs="column" flex layout-fill style="background:pink">
+        <div layout="column" style="background:white; min-width:300px;"
+            flex-order="1" flex-order-xs="2" >
+            <!-- INPUTS -->
+            <md-content layout-padding>
+            <div>
+                <form name="waypointForm">
+                    <div>
+                        <div layout="row" flex >
+                        <md-input-container class="md-block" flex>
+                        <label>Name</label>
+                        <input ng-model="new_waypoint.name">
+                        </md-input-container>
+                        <div class="md-secondary" >
+      <md-button class="md-icon-button md-accent" 
+            ng-click="runQuery()"
+            aria-label="update"
+            ng-disabled="queryLoading">
+        <md-icon  ng-if="!queryLoading" md-svg-icon="action:autorenew"></md-icon>
+        <md-icon  ng-if="queryLoading">
+    <md-progress-circular class="md-hue-2" md-mode="indeterminate" md-diameter="22px"></md-progress-circular>
+</md-icon>
+        </md-button>
+                        </div>
+                        </div>
+                        <md-input-container class="md-block" flex>
+                        <label>Description</label>
+                        <textarea ng-model="new_waypoint.description" 
+                            md-maxlength="450" rows="3" 
+                            md-select-on-focus></textarea>
+                        </md-input-container>
+                        <md-input-container class="md-block" flex
+                        ng-repeat"url in new_waypoint.urls">
+                        <label>URL</label>
+                        <input ng-model="url">
+                        </md-input-container>
+<md-button class="md-primary" ng-href="{{new_waypoint.queryLink}}" target="_blank">overpass turbo</md-button>
+                    </div>
+                </form>
+            </div>
+            </md-content>
+        </div>
+
+
+        <!-- MAP -->
+        <leaflet center="marker_center"  markers="marker_new"  height="100%" width="100%"
+        style="min-height:300px;" layout-fill flex
+        flex-order="2" flex-order-xs="1" 
+        tiles="tiles" layers="layers" defaults="defaults" ></leaflet>
+    </div>
+
+</div>
+<div style="background:white;">
+            <md-content layout-padding
+                style="min-height: 25px;"
+            >
+    <!-- TAGS -->
+
+    <wd-tags ng-model="new_waypoint.tags" ></wd-tags>
+
+            </md-content>
+</div>
+</md-dialog-content>
+
+<!-- BUTTONS -->
+<div class="md-actions" layout="row">
     <span flex></span>
     <md-button ng-click="cancel()" class="md-primary">
-     cancel
+    cancel
     </md-button>
     <md-button ng-click="save()" class="md-primary">
-      save
+    save
     </md-button>
     <md-button ng-click="answer('close')" class="md-primary">
-      close
+    close
     </md-button>
-  </div>
+</div>
 
 
 </md-dialog>

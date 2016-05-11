@@ -12,56 +12,64 @@
         </md-menu-item>-->
         <md-menu-item ng-if="auth.isAdmin()">
             <md-button ng-click="" ui-sref="admin.appConfig">
-                <md-icon md-font-icon="fa fa-gear"></md-icon>
+                <md-icon md-menu-origin md-svg-icon="action:settings"></md-icon>
                 App Config
             </md-button>
         </md-menu-item>
             <md-menu-divider ng-if="auth.isAdmin()"></md-menu-divider>
         <md-menu-item ng-show="auth.isLogged()">
             <md-button ng-click="" ui-sref="profile.view({username: auth.user.username})">
-                <md-icon md-font-icon="fa fa-user"></md-icon>
+                <md-icon md-menu-origin md-svg-icon="action:account_box"></md-icon>
                 My Profile
             </md-button>
         </md-menu-item>
         <md-menu-item ng-hide="auth.isLogged()">
             <md-button ng-click="" ui-sref="signin">
-                <md-icon md-font-icon="fa fa-sign"></md-icon>
+                <md-icon md-menu-origin md-svg-icon="action:lock"></md-icon>
                 Sign In
             </md-button>
         </md-menu-item>
         <md-menu-item ng-hide="auth.isLogged()">
             <md-button ng-click="" ui-sref="signup">
-                <md-icon md-font-icon="fa fa-sign"></md-icon>
+                <md-icon md-menu-origin md-svg-icon="social:person_add"></md-icon>
                 Sign Up
             </md-button>
         </md-menu-item>
         <md-menu-item>
             <md-button ng-click="" ui-sref="users">
-                <md-icon md-font-icon="fa fa-users"></md-icon>
+                <md-icon md-menu-origin md-svg-icon="social:group"></md-icon>
                 Users
             </md-button>
         </md-menu-item>
+        <md-menu-divider ng-if="auth.isAdmin()"></md-menu-divider>
         <md-menu-item ng-if="auth.isAdmin()">
             <md-button ng-click="" ui-sref="collections">
-                <md-icon md-font-icon="fa fa-cubes"></md-icon>
+                <md-icon md-menu-origin md-svg-icon="action:group_work"></md-icon>
                 Groups
             </md-button>
         </md-menu-item>
+        <md-menu-item ng-if="auth.isAdmin()">
+            <md-button ng-click="" ui-sref="tags">
+                <md-icon md-menu-origin md-svg-icon="action:label"></md-icon>
+                Tags
+            </md-button>
+        </md-menu-item>
+        <md-menu-divider></md-menu-divider>
         <md-menu-item ng-show="cfg.has_feedback_form">
             <md-button ng-click="" ui-sref="feedback">
-                <md-icon md-font-icon="fa fa-comment"></md-icon>
+                <md-icon md-menu-origin md-svg-icon="action:feedback"></md-icon>
                 Feedback
             </md-button>
         </md-menu-item>
         <md-menu-item ng-show="cfg.development">
             <md-button  ng-click="generateDatabase()">
-                <md-icon md-font-icon="fa fa-database"></md-icon>
+                <md-icon md-menu-origin md-svg-icon="file:cloud_circle"></md-icon>
                 Generate Database
             </md-button>
         </md-menu-item>
         <md-menu-item ng-show="auth.isLogged()">
             <md-button ng-click="" ui-sref="signout" class="md-warn">
-                <md-icon md-font-icon="fa fa-sign-out"></md-icon>
+                <md-icon md-menu-origin md-svg-icon="action:exit_to_app"></md-icon>
                 Sign Out
             </md-button>
         </md-menu-item>

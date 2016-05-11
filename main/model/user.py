@@ -17,7 +17,7 @@ class UserValidator(model.BaseValidator):
     bio = [0, 140]
     location = [0, 70]
     social = [0, 50]
-    link_to_avatar = util.URL_REGEX
+    avatar_url = util.URL_REGEX
 
     @classmethod
     def token(cls, token):
@@ -56,7 +56,7 @@ class User(model.Base):
     name = ndb.StringProperty(default='', validator=UserValidator.create('name'))
     username = ndb.StringProperty(required=True, validator=UserValidator.create('username'))
     email = ndb.StringProperty(default='', validator=UserValidator.create('email', required=False))
-    link_to_avatar = ndb.StringProperty(default='', validator=UserValidator.create('link_to_avatar', required=False))
+    avatar_url = ndb.StringProperty(default='', validator=UserValidator.create('avatar_url', required=False))
     auth_ids = ndb.StringProperty(repeated=True)
     active = ndb.BooleanProperty(default=True)
     admin = ndb.BooleanProperty(default=False)
@@ -78,16 +78,16 @@ class User(model.Base):
 
     PRIVATE_PROPERTIES = ['admin', 'active', 'auth_ids', 'email', 'permissions', 'verified']
 
-    @property
-    def avatar_url(self):
-        """Returns gravatar url, created from user's email or username"""
-        if self.link_to_avatar != '':
-            return self.link_to_avatar
-        else:
-            return '//gravatar.com/avatar/%(hash)s?d=identicon&r=x&s=45' % {
-                'hash': hashlib.md5(
-                    (self.email or self.username).encode('utf-8')).hexdigest()
-            }
+    #@property
+    #def avatar_url(self):
+        #"""Returns gravatar url, created from user's email or username"""
+        #if self.link_to_avatar != '':
+            #return self.link_to_avatar
+        #else:
+            #return '//gravatar.com/avatar/%(hash)s?d=identicon&r=x&s=45' % {
+                #'hash': hashlib.md5(
+                    #(self.email or self.username).encode('utf-8')).hexdigest()
+            #}
 
     def has_password(self, password):
         """Tests if user has given password"""
@@ -136,4 +136,10 @@ class User(model.Base):
                 permissions=permissions or util.param('permissions', list),
                 **kwargs
               )
+
+    def _pre_put_hook(self):
+        if self.avatar_url == '':
+            self.avatar_url =  'https://gravatar.com/avatar/{hash}s?d=identicon&r=x&s=45'.format(hash=hashlib.md5((self.email or self.username).encode('utf-8')).hexdigest())
+
+
 

@@ -5,7 +5,7 @@ from __future__ import absolute_import
 from google.appengine.ext import ndb
 
 import config
-from datetime import date
+import datetime
 from pydash import _
 import util
 
@@ -97,20 +97,36 @@ class Base(ndb.Model):
         """
         repr_dict = {}
         if include is None:
+            #include=self.get_all_properties()
             return super(Base, self).to_dict(include=include)
 
         for name in include:
-            attr = getattr(self, name)
-            if isinstance(attr, date):
+            if hasattr(self, name):
+                attr = getattr(self, name)
+            else:
+                continue
+
+            if isinstance(attr, datetime.date):
                 repr_dict[name] = attr.isoformat()
             elif isinstance(attr, ndb.Key):
                 if name == 'key':
                     repr_dict[name] = self.key.urlsafe()
                     repr_dict['id'] = self.key.id()
                 else:
-                    repr_dict[name] = attr.urlsafe();
+                    repr_dict[name] = attr.urlsafe()
+            elif isinstance(attr, ndb.GeoPt):
+                if name == 'geo':
+                    repr_dict['lat'] = attr.lat
+                    repr_dict['lng'] = attr.lon
+                else:
+                    repr_dict[name] = {'lat':attr.lat,
+                                    'lon': attr.lon}
+            elif hasattr(attr, 'key'): # it is a structured property -> recursive
+                repr_dict[name] = attr.to_dict(include=attr.get_all_properties())
             else:
                 repr_dict[name] = attr
+
+            #print "Got: {}".format(repr_dict[name])
 
         return repr_dict
 
@@ -141,7 +157,8 @@ class Base(ndb.Model):
     @classmethod
     def get_all_properties(cls):
         """Gets all model's ndb properties"""
-        return ['key', 'id'] + _.keys(cls._properties)
+        return ['key'] + _.keys(cls._properties)
+        #return ['key', 'id'] + _.keys(cls._properties)
 
 
     # new methods
@@ -172,6 +189,17 @@ class Base(ndb.Model):
         ent.put()
         return (ent, True)  # True meaning "created"
 
+    @classmethod
+    def create_or_update(cls,key=None,**kwargs):
+        """ Updates a collection or creates a new one """
+        if key:
+            db = key.get()
+            db.populate(**kwargs)
+        else:
+            db = cls(**kwargs)
+        key = db.put()
+        return key
+
 
 
     @classmethod
@@ -183,6 +211,59 @@ class Base(ndb.Model):
             order=order or util.param('order'),
             **kwargs
           )
+
+
+    @classmethod
+    def qry(cls, entity, order_by_date='-modified', compare_date=None,
+                        date=None, time_offset=None, **kwargs):
+        """Base query
+
+        order_by_date can be either: '-modified', 'modified',
+                                     '-created', 'created', or None (no order)
+        compare_date can be : '>modified', '<modified', '>created', '<created',
+                              '>=modified', '<=modified', '>=created', '<=created',
+                              or None
+        if compare_date is set a date is needed which is used to compare to
+
+        date : Is either a datetime.datetime object or a string (Y-m-d H:M:S)
+        time_offset : An offset to the given date in seconds (eg. -30: minus 30 seconds)
+
+                                     """
+        qry = entity.query(**kwargs)
+        if order_by_date == '-modified':
+            qry = qry.order(-cls.modified)
+        elif order_by_date == 'modified':
+            qry = qry.order(cls.modified)
+        elif order_by_date == 'created':
+            qry = qry.order(cls.created)
+        elif order_by_date == '-created':
+            qry = qry.order(-cls.created)
+
+        if date:
+            if isinstance(date, basestring):
+                date = datetime.datetime.strptime(date,"%Y-%m-%d %H:%M:%S")
+            if time_offset:
+                date = date + datetime.timedelta(seconds=time_offset)
+            if compare_date == '>modified' :
+                qry = qry.filter(cls.modified > date)
+            elif compare_date == '>=modified' :
+                qry = qry.filter(cls.modified >= date)
+            elif compare_date == '<modified' :
+                qry = qry.filter(cls.modified < date)
+            elif compare_date == '<=modified' :
+                qry = qry.filter(cls.modified <= date)
+            elif compare_date == '>created' :
+                qry = qry.filter(cls.created > date)
+            elif compare_date == '>=created' :
+                qry = qry.filter(cls.created >= date)
+            elif compare_date == '<created' :
+                qry = qry.filter(cls.created < date)
+            elif compare_date == '<=created' :
+                qry = qry.filter(cls.created <= date)
+
+        return qry
+
+
 
     def __getitem__(self, key):
         #self._validateKey(key)

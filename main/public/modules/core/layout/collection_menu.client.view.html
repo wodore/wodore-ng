@@ -1,26 +1,167 @@
 <!--<div ng-controller="TopMenuController">-->
-<div ng-controller="CollectionMenuController as ctrl" class="collection-menu" layout="row"  >
-
-<form ng-submit="$event.preventDefault()" layout="row">
-        <md-button class="md-fab md-mini" aria-label="Add Collection">
-            <i class="fa fa-plus btn-icon"></i>
+<div ng-controller="CollectionMenuController">
+    <!-- MENU toolbar collection -->
+    <div class="" ng-if="auth.isLogged()">
+        <md-menu  md-position-mode="target-right target">
+        <md-button layout="row" layout-align="center center" ng-class="{'md-icon-button':active_collection.avatar_url}"
+        flex="none" ng-click="openMenu($mdOpenMenu, $event)">
+        <img class="profile-pic" ng-src="{{active_collection.avatar_url}}"  flex="none"></img>
+        <span ng-if="!active_collection.avatar_url">{{active_collection.name}}</span>
         </md-button>
-      <md-autocomplete ng-disabled="ctrl.isDisabled" md-no-cache="ctrl.noCache" md-selected-item="ctrl.selectedItem" md-search-text-change="ctrl.searchTextChange(ctrl.searchText)" md-search-text="ctrl.searchText" md-selected-item-change="ctrl.selectedItemChange(item)" md-items="item in ctrl.querySearch(ctrl.searchText)" md-item-text="item.name" md-min-length="0" placeholder="Choose a group" md-menu-class="autocomplete-collection-template" autofocus="false">
-        <md-item-template>
-          <span class="item-title">
-            <i class="fa fa-{{item.icon}} btn-icon"></i>
-            <span> <strong> {{item.name}} </strong></span>
-            <span class="item-metastat">
-              {{item.members}} members
-            </span>
-          </span>
-          <span class="item-metadata">
-            <span class="item-metastat">
-              <em>{{item.desc | limitTo : 25}}{{item.desc.length > 25 ? ' ...' : ''}}</em> 
-            </span>
-          </span>
-        </md-item-template>
-      </md-autocomplete>
-    </form>
+        <!-- MENU CONTENT ---- HEADER -->
+        <md-menu-content width="4" class="collection-menu">
+        <md-menu-item hide> </md-menu-item>
+        <md-toolbar ng-class="{'md-tall':largeHeader}" class="md-hue-2 col_header_big" md-whiteframe="1">
+        <div layout="row" class="" layout-padding>
+            <img class="col_img" 
+                ng-src="{{active_collection.avatar_url}}" 
+                ng-class="{'col_img_big': largeHeader,
+                           'col_img_small': smallHeader}"></img>
+            <div layout="column">
+                <p class="col_name"
+                   ng-class="{'md-display-1': largeHeader,
+                           'md-body': smallHeader}"> {{active_collection.name}} </p>
+                <p class="md-subhead col_name" ng-if="largeHeader"> {{active_collection.description}} </p>
+            </div>
+        </div>
+        <!-- button add collection -->
+        <md-button class="md-fab switch-btn" 
+        aria-label="Add group"
+        ng-if="largeHeader"
+        ui-sref="collection.edit({collection: 'add'})">
+        <md-icon md-svg-icon="content:add"></md-icon>
+        </md-button>
+        <!-- button go back -->
+        <md-button md-prevent-menu-close 
+        class="switch-btn-back md-icon-button"
+        aria-label="go back" ng-if="smallHeader"
+        ng-click="goBackFn()">
+        <md-icon md-svg-icon="navigation:arrow_back"></md-icon>
+        </md-button>
+        <!-- button edit -->
+        <md-button 
+        class="switch-btn-back md-icon-button"
+        aria-label="edit group" ng-if="largeHeader && active_collection.is_admin"
+        ui-sref="collection.edit({collection: active_collection.key})">
+        <md-icon md-svg-icon="image:edit"></md-icon>
+        </md-button>
+        </md-toolbar>
+        <md-toolbar ng-if="!showCollections && (!active_collection.private && !active_collection.public)"
+        class="md-toolbar-tools md-primary md-hue-1"
+        md-shrink-speed-factor="0.5"
+        md-prevent-menu-close 
+        ng-click="showUsersFn()"
+        style="cursor: pointer;">
+        <!-- MENU CONTENT ---- USERS -->
+        <div layout-column flex>
+            <div class="md-title">{{col_users.length}} users</div>
+            <div class="md-caption" ng-if="!showUsers">
+                <span ng-repeat="col in col_users | limitTo:4">
+                    {{col.user.name}}<span ng-if="!$last">,&nbsp;</span>
+                    <span ng-if="$last && col_users.length === 5 "> and one more. </span>
+                    <span ng-if="$last && col_users.length > 5"> and others. </span>
+                </span>
+            </div>
+        </div>
+        <!-- ADD users button -->
+        <div flex="none">
+            <!--{{showUsersText}}-->
+            <md-button 
+            ng-if="showUsers && active_collection.is_admin"
+            ui-sref="collection.edit({collection: active_collection.key})">
+            <!--ng-click="showCollectionsFn()">-->
+            {{showUsersText}}
+            </md-button>
+        </div>
+        </md-toolbar>
+        <md-content ng-if=showUsers>
+        <md-list class="md-dense">
+        <!-- users list -->
+        <md-list-item class=" md-2-line " 
+        ng-repeat="col in col_users "
+        ng-if="!col.deleted">
+        <img ng-src="{{col.user.avatar_url}} " class="md-avatar " alt="{{col.user.name}} " />
+        <div class="md-list-item-text ">
+            <h3>{{ col.user.name }}</h3>
+            <p>{{col.user.email}}</p>
+            <!-- user's permission -->
+            <md-button md-prevent-menu-close class="md-icon-button md-secondary" 
+            aria-label="permission: {{col.permission}}" 
+            ng-if="col.permission" 
+            ng-click="newCollection(local_col)">
+            <md-icon md-svg-icon="{{permIcons[col.permission]}}"></md-icon>
+            </md-button>
+            <!-- delete -->
+            <md-button md-prevent-menu-close class="md-icon-button md-secondary" 
+            aria-label="delete" ng-if="active_collection.is_admin"
+            ng-click="col.deleted=true;removeUser(col.user)">
+            <md-icon md-svg-icon="action:delete"></md-icon>
+            </md-button>
+            <!--<md-select ng-model="col.permission" style="display: inherit; margin: 0; width: 25px;" md-selected-text="returnIcon(col.permission)" ng-if="col.permission !== 'creator'" class="md-secondary" >
+    <md-select-header>
+      <small> Permission </small>
+    </md-select-header>
+          <md-option ng-repeat="state in ['none','read','write','admin']" value="{{state}}">
+          <md-icon md-svg-icon='{{permIcons[state]}}' aria-label="{{col.permission}}" class="md-secondary md-hue-3" ng-if="col.permission" ></md-icon> <small>{{state}}</small>
+          </md-option>
+        </md-select>-->
+
+        </div>
+        </md-list-item>
+        </md-list>
+        </md-content>
+        <!-- MENU CONTENT ---- MORE COLLECTIONS -->
+        <md-toolbar ng-if="!showUsers" class="md-toolbar-tools md-primary md-hue-3"
+        md-prevent-menu-close 
+        ng-click="showCollectionsFn()"
+        style="cursor: pointer;">
+        <div layout-column flex>
+            <div class="md-title">Other groups ...</div>
+        </div>
+        <div flex="none">
+            <md-button md-prevent-menu-close 
+                class="md-primary" 
+                ng-if="showCollections"
+                ng-disabled="!moreCollections"
+                ng-click="loadCollectionsFn()">load more</md-button>
+        </div>
+        </md-toolbar>
+        <md-content ng-if="!showUsers">
+        <md-list class="md-dense">
+        <md-list-item ng-class="{col_details:local_col.more}" class=" md-2-line " ng-repeat="local_col in collections | orderBy : 'modified' | limitTo:collectionLimit " ng-if="$index < collectionLimit">
+        <img ng-src="{{local_col.avatar_url}} " class="md-avatar " alt="{{local_col.name}} " />
+        <div class="md-list-item-text ">
+            <h3>{{ local_col.name }}</h3>
+            <p ng-if="local_col.more">{{local_col.description}}</p>
+            <!-- permission -->
+            <md-icon class="md-icon-button md-secondary" 
+            aria-label="permission: {{local_col.permission}}"
+            md-svg-icon="{{permIcons[local_col.permission]}}">
+            </md-icon>
+            <!-- more information -->
+            <md-button
+            class="md-icon-button md-secondary"
+            aria-label="more information"
+            ui-sref="collection.view({collection: local_col.key})">
+            <md-icon md-svg-icon="action:info"></md-icon>
+            </md-button>
+            <!-- choose collection -->
+            <md-button class="md-icon-button md-secondary" 
+            aria-label="take this group"
+            ng-click="newCollection(local_col)">
+            <md-icon md-svg-icon="navigation:check"></md-icon>
+            </md-button>
+        </div>
+        </md-list-item>
+        </md-list>
+        </md-content>
+        <!--
+-->
+        </md-menu-content>
+        </md-menu>
+
+    </div>
+</div>
+
 
 </div>

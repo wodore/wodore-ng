@@ -5,7 +5,7 @@ Provides decorator functions for api methods, which are used as middleware for p
 import functools
 from google.appengine.ext import ndb #pylint: disable=import-error
 from flask import g, abort
-from helpers import make_not_found_exception, ArgumentValidator
+from helpers import make_not_found_exception, ArgumentValidator, make_bad_request_exception
 from main import config, auth
 from flask_restful import reqparse, inputs
 import model
@@ -118,6 +118,19 @@ def authorization_required(func):
 
     return decorated_function
 
+def collection_permission(perm='read',eq=False):
+    def real_decorator(func):
+        def wrapper(*args, **kwargs):
+            g.col_key = ndb.Key(urlsafe=kwargs['collection'])
+            if model.Collection.has_permission(collection_key=g.col_key,
+                    user_key=auth.current_user_key() ,
+                    permission=perm,
+                    equal=eq):
+                return func(*args, **kwargs)
+            else:
+                return make_bad_request_exception("No {} permission".format(perm))
+        return wrapper
+    return real_decorator
 
 def parse_signin(func):
     """Parses credentials posted by client and loads appropriate user from datastore"""

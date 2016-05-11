@@ -1,118 +1,100 @@
 (function() {
     'use strict';
     var module = angular.module('core');
+    module.controller('CollectionMenuController', function(
+        $scope, Restangular, wdCollections, gaToast, $timeout, $log
+    ) {
+        $log.info("Init CollectionMenuController");
 
-    module.controller('CollectionMenuController', function($scope, Restangular,
-                                gaToast, $timeout) {
+        $scope.active_collection = wdCollections.get_collection();
+
+        $scope.permIcons = wdCollections.permission_to_icon
+
+        $scope.collections = wdCollections.get_list(true,false);
+        $scope.openMenu = function($mdOpenMenu, ev) {
+            // Load at least three collections
+            if (wdCollections.loadedLen() < 5){
+                wdCollections.load(5).then(function(col){
+                    $scope.collections = wdCollections.get_list(true,false);
+                });
+            }
+            Restangular.one('collections',$scope.active_collection.key)
+                .all('users')
+                .getList({size:50})
+                .then(function(users){
+                    $log.info(users);
+                    $scope.col_users = users;
+                    //$scope.usersInit = _.cloneDeep(users);
+                },function(msg){
+                    $log.error(msg);
+                    $scope.col_users = [];
+            });
+            var originatorEv = ev;
+            $mdOpenMenu(ev);
+        };
 
 
-    var self = this;
 
-    self.simulateQuery = false;
-    self.isDisabled    = true;
 
-    self.repos         = loadAll();
-    self.querySearch   = querySearch;
-    self.selectedItemChange = selectedItemChange;
-    self.searchTextChange   = searchTextChange;
-
-    // ******************************
-    // Internal methods
-    // ******************************
-
-    /**
-     * Search for repos... use $timeout to simulate
-     * remote dataservice call.
-     */
-    function querySearch (query) {
-      var results = query ? self.repos.filter( createFilterFor(query) ) : self.repos,
-          deferred;
-      if (self.simulateQuery) {
-        deferred = $q.defer();
-        $timeout(function () { deferred.resolve( results ); }, Math.random() * 1000, false);
-        return deferred.promise;
+    $scope.largeHeader = true;
+    $scope.smallHeader = !$scope.largeHeader;
+    $scope.showUsers = false;
+    $scope.showUsersText = "show";
+    $scope.showUsersFn = function() {
+      if ($scope.showUsers) {
+        $scope.showUsers = false
+        $scope.largeHeader = true;
+        $scope.smallHeader = !$scope.largeHeader;
+        $scope.showUsersText = "show";
       } else {
-        return results;
+        $scope.showUsers = true
+        $scope.largeHeader = false;
+        $scope.smallHeader = !$scope.largeHeader;
+        $scope.showUsersText = "add user";
+      }
+    }
+    $scope.collectionLimit = 3
+    $scope.showCollections = false
+    $scope.showCollectionsText = "more";
+    $scope.showCollectionsFn = function() {
+      if ($scope.showCollections) {
+        $scope.loadCollectionsFn();
+        //$scope.showCollections = false
+        //$scope.collectionLimit = 3
+        //$scope.largeHeader = true;
+        //$scope.smallHeader = !$scope.largeHeader;
+        //$scope.showCollectionsText = "more";
+      } else {
+        $scope.showCollections = true
+        $scope.collectionLimit = 1000
+        $scope.largeHeader = false;
+        $scope.smallHeader = !$scope.largeHeader;
+        $scope.showCollectionsText = "less";
+        $scope.loadCollectionsFn();
       }
     }
 
-    function searchTextChange(text) {
-      $log.info('Text changed to ' + text);
+    $scope.moreCollections = true
+    $scope.loadCollectionsFn = function() {
+        wdCollections.load(5).then(function(col){
+            $scope.moreCollections = wdCollections.more()
+            });
     }
 
-    function selectedItemChange(item) {
-      $log.info('Item changed to ' + JSON.stringify(item));
+    $scope.goBackFn = function() {
+        $scope.largeHeader = true;
+        $scope.smallHeader = !$scope.largeHeader;
+        $scope.showUsers = false
+        $scope.showCollections = false
+        $scope.collectionLimit = 3
+        $scope.showCollectionsText = "more";
+        $scope.showUsersText = "show";
     }
 
-    /**
-     * Build `components` list of key/value pairs
-     */
-    function loadAll() {
-      var repos = [
-        {
-          'name'      : 'Private',
-          'desc'      : 'It\'s your personal group, only you have access.',
-          'members'   : '1',
-          'icon'      : 'key',
-          'forks'     : '16,175',
-        },
-        {
-          'name'      : 'Hiking Group',
-          'desc'      : 'Colleciton for hikes.',
-          'members'   : '6',
-          'icon'      : 'user',
-          'forks'     : '760',
-        },
-        {
-          'name'      : 'Mountains',
-          'desc'      : 'Let\'s go into the mountains!',
-          'members'   : '12',
-          'icon'      : 'keys',
-          'forks'     : '1,241',
-        },
-        {
-          'name'      : 'Ski with Friends',
-          'desc'      : 'What about going skiing as much as possible.',
-          'members'   : '4',
-          'icon'      : 'cubes',
-          'forks'     : '84',
-        },
-        {
-          'name'      : 'Not used anymore',
-          'desc'      : 'none',
-          'members'   : '21',
-          'icon'      : 'bus',
-          'forks'     : '303',
-        }
-      ];
-      return repos.map( function (repo) {
-        repo.value = repo.name.toLowerCase();
-        return repo;
-      });
+    $scope.newCollection = function(col){
+        wdCollections.set_collection(col,false);
+        $scope.goBackFn();
     }
-
-    /**
-     * Create filter function for a query string
-     */
-    function createFilterFor(query) {
-      var lowercaseQuery = angular.lowercase(query);
-
-      return function filterFn(item) {
-        return (item.value.indexOf(lowercaseQuery) === 0);
-      };
-
-    }
-
-
-
-
-
-
-
-
-
-
-
 
     });
 }());

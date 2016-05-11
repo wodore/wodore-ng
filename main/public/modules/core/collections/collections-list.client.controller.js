@@ -72,8 +72,6 @@
             $scope.collectionsLength = wdCollections.loadedLen(filter); 
             $scope.totalCount = wdCollections.totalLen(); 
             wdCollections.more[filterName] = true;
-            $log.info("SHOW ALL !!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-            $log.info($scope.showAll);
             wdCollections.load(5,filterLoad,filterName).then(function(){
                 $log.debug(wdCollections.getList())
             });

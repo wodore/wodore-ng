@@ -8,3 +8,5 @@ Provides logic for non API urls
 from .error import *
 from .index import *
 from .user import *
+from .resource import *
+from .admin import *

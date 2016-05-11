@@ -52,9 +52,14 @@
             'lib/lodash/lodash.js',
             'lib/lrInfiniteScroll/lrInfiniteScroll.js',
             'lib/angular-simple-logger/dist/angular-simple-logger.js',
-            'lib/angular-leaflet-directive/dist/angular-leaflet-directive.js',
+            //'lib/angular-leaflet-directive/dist/angular-leaflet-directive.js',
+            //'http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js',
+            'lib/ui-leaflet/dist/ui-leaflet.js',
+            'lib/leaflet.markercluster/dist/leaflet.markercluster.js',
             'lib/angulartics/src/angulartics.js',
-            'lib/angulartics/src/angulartics-ga.js'
+            'lib/angulartics/src/angulartics-ga.js',
+            'lib/ng-file-upload/ng-file-upload.js',
+            'lib/ifvisible.js/src/ifvisible.js'
         ],
         scripts : [
             'application.js',
@@ -63,6 +68,7 @@
         ]
     };
     var cssFiles = [
+    // Add it to the manifest.less file !
         //'lib/angular-material/angular-material.css'
     ];
     var lessPaths = [

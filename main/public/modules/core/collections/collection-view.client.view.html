@@ -26,9 +26,9 @@
     </div>
     <!--<md-contact-chips
         ng-model="users"
-        md-contact-name="user_username"
-        md-contact-image="user_avatar_url"
-        md-contact-email="user_email"
+        md-contact-name="username"
+        md-contact-image="avatar_url"
+        md-contact-email="email"
         readonly="true"
         md-highlight-flags="i"
         placeholder="To">
@@ -36,10 +36,10 @@
      <md-chips flex class="md-contact-chips" ng-model="users" readonly="true">
                             <md-chip-template>
                                 <div class="md-contact-avatar">
-                                    <img ng-src="{{$chip.user_avatar_url}}" alt="{{$chip.user_username}}" ng-if="$chip.user_avatar_url" />
+                                    <img ng-src="{{$chip.user.avatar_url}}" alt="{{$chip.user.username}}" ng-if="$chip.user.avatar_url" />
                                 </div>
                                 <div class="md-contact-name">
-                                    {{$chip.user_username}}
+                                    {{$chip.user.username}}
                                     <md-icon md-svg-icon="{{permIcons[$chip.permission]}}" aria-label="{{$chip.permission}}" class="md-secondary md-hue-3" ng-if="$chip.permission" ></md-icon>
                                     <!--<small>{{$chip.permission}}</small>-->
                                 </div>

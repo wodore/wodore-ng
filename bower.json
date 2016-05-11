@@ -16,8 +16,11 @@
     "lrInfiniteScroll": "~1.0.0",
     "angulartics": "~0.17.2",
     "restangular": "https://github.com/mgonto/restangular.git#1.5.2",
-    "angular-leaflet-directive" : "https://github.com/tombatossals/angular-leaflet-directive.git#v0.10.0",
-    "material-design-iconsets" : "https://github.com/nkoterba/material-design-iconsets.git"
+    "ui-leaflet" : "https://github.com/angular-ui/ui-leaflet.git#v1.0.0",
+    "leaflet.markercluster" : "0.5.0",
+    "material-design-iconsets" : "https://github.com/nkoterba/material-design-iconsets.git",
+    "ng-file-upload ": "~12",
+    "ifvisible.js": "1.0.4"
   },
   "resolutions": {
     "lodash": "~4.0.0",

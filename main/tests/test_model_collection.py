@@ -195,8 +195,8 @@ class TestCollection(unittest.TestCase):
     usr_dbs = model.CollectionUser.qry().fetch()
     #model.CollectionUser.print_list(usr_dbs)
     self.assertEqual(len(usr_dbs), 7)
-    self.assertEqual(usr_dbs[0].user_name, "New User One")
-    self.assertEqual(usr_dbs[2].user_name, "New User One")
+    self.assertEqual(usr_dbs[0].user.name, "New User One")
+    self.assertEqual(usr_dbs[2].user.name, "New User One")
 
 
 

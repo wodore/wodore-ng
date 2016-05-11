@@ -4,8 +4,9 @@
 
 
     module.controller('BackMapController', function($scope, $mdSidenav, 
-                    gaAuthentication, gaAppConfig,
-                    Restangular, gaToast, $timeout, $mdMedia, $mdDialog) {
+                    gaAuthentication, gaAppConfig, wdTags, wdWayPoints,
+                    $interval, Restangular, gaToast, $timeout, $mdMedia,
+                    $mdDialog, wdCollections,$log) {
         var tilesDict
         var layers
         
@@ -15,10 +16,28 @@
             $scope.screen_gt_md = gt_md;
           });
 
+        // Load waypoints
+        // TODO add event from wdCollections which is emited when it changes
+        // $emit, $broadcast
+        // // TODO do not do it with interval!!
+        $interval(function(){
+            $scope.markers = wdWayPoints.current_waypoints;
+        },500,10);
+        wdCollections.change_event(function(){
+            $scope.markers = wdWayPoints.current_waypoints;
+        });
+
+        //$timeout(function(){
+            //wdWayPoints.load().then(
+                //function(more){
+                //$scope.markers = wdWayPoints.waypoints[wdCollections.get_collection().key]['data']
+                //$log.info("New markers are")
+                //$log.info($scope.markers)
+                //});
+            //},2000);
+
+
         // Tile servers
-        // TODO
-        // add:
-        // http://opentopomap.org/
         if (true) { // if true --> ONLINE
         tilesDict = {
             thunderforestOutdoors : {
@@ -148,9 +167,9 @@
         //$scope.showMap = true;
         angular.extend($scope, {
                 center: {
-                    lat: 46.85,
-                    lng: 10.5,
-                    zoom: 9
+                    lat: 46.78,
+                    lng: 9.9,
+                    zoom:13 
                 },
                 defaults: {
                     scrollWheelZoom: true,
@@ -205,7 +224,7 @@
             })
         });
 
-        function DialogController($scope, $mdDialog) {
+        function DialogController($scope, $mdDialog, wdOverpass,$log,wdTags) {
           console.log($scope)
 
           $scope.hide = function() {
@@ -213,10 +232,35 @@
             $mdDialog.hide();
           };
           $scope.save = function() {
-            console.log($scope.marker_new)
+            $log.info("Save waypoint");
+            $log.info($scope.marker_new);
+            $log.info($scope.new_waypoint);
             $scope.marker_new[0].draggable = false
-            $scope.markers.push($scope.marker_new[0])
+            $scope.new_waypoint.geo = $scope.marker_new[0].lat+","+$scope.marker_new[0].lng;
+            $scope.new_waypoint.lat = $scope.marker_new[0].lat;
+            $scope.new_waypoint.lng = $scope.marker_new[0].lng;
             $mdDialog.hide();
+            var collection = wdCollections.get_collection().key;
+            self = this;
+            $scope.new_waypoint.tags = _.map($scope.new_waypoint.tags,_.property('name'));
+            wdWayPoints.add_async(collection,$scope.new_waypoint)
+            //Restangular.one('waypoints',collection)
+                //.customPUT({collection:collection, 
+                            //key : null,
+                            //name:$scope.new_waypoint.name,
+                            //description:$scope.new_waypoint.description,
+                            //urls:$scope.new_waypoint.urls,
+                            //tags: tags,
+                            //geo :$scope.marker_new[0].lat+","+$scope.marker_new[0].lng
+                            //})
+                //.then(function(answer){
+                    //$log.debug("[save waypoint] answer: ")
+                    ////$log.debug(key)
+                    //$scope.markers.push($scope.marker_new[0])
+                    //$scope.markers[answer.id] = $scope.marker_new[0]
+                    //$scope.markers.refreshClusters();
+                //});
+
           };
           $scope.cancel = function() {
             console.log("cancel")
@@ -226,6 +270,37 @@
             $mdDialog.hide(answer);
             console.log(answer)
           };
+
+
+        $scope.new_waypoint = {};
+        $scope.new_waypoint.name = "";
+        $scope.new_waypoint.urls = [];
+        $scope.new_waypoint.tags = [];
+
+        var query = wdOverpass.overpass_query({radius:220});
+        //$log.info(query);
+        $scope.queryLoading = false;
+        $scope.runQuery = function(){
+            $scope.queryLoading = true;
+            var latlong= $scope.marker_new[0].lat+","+$scope.marker_new[0].lng;
+            $log.info("Coordinates are: "+latlong)
+            query(latlong,function(out){
+                $log.info(out)
+                $scope.new_waypoint.name = out.name;
+                $scope.new_waypoint.queryLink = out.queryLink;
+                $scope.new_waypoint.description = out.description;
+                $scope.new_waypoint.urls[0] = out.url;
+                if (out.tags){
+                    wdTags.get_async(out.tags).then(function(tags){
+                        $scope.new_waypoint.tags = tags;
+                    });
+                }
+                $scope.queryLoading = false;
+            }); 
+        }
+        $scope.runQuery()
+
+
         }
 
 

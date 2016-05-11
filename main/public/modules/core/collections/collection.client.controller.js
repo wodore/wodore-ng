@@ -22,17 +22,19 @@
         }
 
         //$scope.Users = {edit : false};
+        $scope.avatar = false
         $scope.users = [];
         $scope.usersInit = [];
         $scope.permIcons = wdCollections.permission_to_icon
         var key = $stateParams.collection
         if (key === 'add'){
-            $scope.users = [gaAuthentication.user];
+            $scope.users = [{'user':gaAuthentication.user,'permission':'creator'}];
             $scope.usersInit = _.cloneDeep($scope.users);
             //$scope.collection = {permission:'creator',active:true};
             $scope.collection = Restangular.restangularizeElement(null, {}, 'collections/add');
             $scope.collection.permission = 'creator';
             $scope.collection.active = true;
+            $scope.collection.avatar_url = "";
 
         } else {
 

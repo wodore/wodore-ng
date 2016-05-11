@@ -39,8 +39,8 @@ class TagValidator(model.BaseValidator):
             tags = []
             for t in tag:
                 tags.append(cls.name(t))
-            return tags
-        tag = util.constrain_string(tag,1,14)
+            return list(set(tags))
+        tag = util.constrain_string(tag,1,20)
         return tag.lower().strip() if len(tag) > 4 else tag.strip()
 
 
@@ -49,6 +49,7 @@ class TagStructure(ndb.Model): # use the counter mixin
     """Basic tag class
     """
     icon_id = ndb.IntegerProperty(indexed=True,required=True,default=0)
+    icon_url = ndb.StringProperty(required=True,default="",indexed=False)
     name = ndb.StringProperty(indexed=True,required=True)
     color = ndb.StringProperty(indexed=True,required=True)
 
@@ -64,7 +65,7 @@ class Tag(Iconize, CountableLazy, AddCollection, model.Base):
     name = ndb.StringProperty(indexed=True,required=True,
       validator=_validate_tag)
 
-    color = ndb.StringProperty(indexed=True,required=True,default='blue')
+    color = ndb.StringProperty(indexed=True,required=True,default='')
     approved = ndb.BooleanProperty(required=True,default=False)
 # category can be sofar: 'level', 'waypoint' , 'route'
     category = ndb.StringProperty(indexed=True,repeated=True,\
@@ -77,8 +78,8 @@ class Tag(Iconize, CountableLazy, AddCollection, model.Base):
          strip it and lower it if shorther than 4 letters.
          'tag' can also be a list with tags!
         """
-        print "[model/tag.py] done use 'validate_tag' anymore!"
-        print "[model/tag.py] replace it with 'TagValidator.name'"
+        print "[model/tag.py] dont use 'validate_tag' anymore!"
+        print "[model/tag.py] replace it with 'TagValidator.name(tag)'"
         return TagValidator.name(tag)
 
 
@@ -87,14 +88,27 @@ class Tag(Iconize, CountableLazy, AddCollection, model.Base):
         """ Returns a TagStructure.
 
         Should be used instead of directly accessing the properties for a tag.
-        This can be saved as a property be other models.
+        This can be saved as a property by other models.
         """
         #if self.key is None:
           #raise UserWarning("Key not set yet, use first 'put()' before you use this method.")
         #self.icon.icon_key = self.key
 # TODO detel icon!
+        icon_url = getattr(self,'icon_url')
+        icon_id = getattr(self,'icon_id')
+        color = getattr(self,'color')
+        if not icon_url or not color:
+            # take parent icon url
+            if getattr(self,'toplevel') and getattr(self,'collection') != Collection.top_key():
+                parent_db = self.toplevel.get().get_tag()
+                if parent_db:
+                    icon_url = parent_db.icon_url if not icon_url else icon_url
+                    icon_id = parent_db.icon_id if not icon_url else icon_id
+                    color = parent_db.color if not color else color
+
         return TagStructure(name=self.name,\
-            color=self.color,icon_id=getattr(self,'icon_id'))
+            color=color or 'blue',icon_id=icon_id,\
+            icon_url=icon_url)
 
     # TODO write tests
     def related(self,char_limit=15,word_limit=None,char_space=4):
@@ -125,7 +139,7 @@ class Tag(Iconize, CountableLazy, AddCollection, model.Base):
     def tag_to_keyname(name,collection=None):
         """Returns a key name (string)"""
         col = collection or Collection.top_key()
-        return "tag__{}_{}".format(name.lower(), col.id())
+        return "tag__{}_{}".format(TagValidator.name(name), col.id())
 
     @staticmethod
     def tag_to_key(name, collection=None):
@@ -140,9 +154,31 @@ class Tag(Iconize, CountableLazy, AddCollection, model.Base):
         return tagnames
 
     @classmethod
+    def get_tag_infos(cls,names,collection=None,urlsafe=False):
+        if urlsafe and collection:
+            collection = ndb.Key(urlsafe=collection)
+        tags=[]
+        for name in names:
+            #print "Check tag '{}' with the collection id '{}'".format(name,collection.id() if collection else None)
+            key = model.Tag.tag_to_key(name,collection)
+            try:
+                db = key.get()
+                tag = db.get_tag().to_dict()
+            except:
+                if not collection or collection == Collection.top_key():
+                    tag = TagStructure(name=TagValidator.name(name), color='blue').to_dict()
+                else:
+                    tag = cls.get_tag_infos([name])[0]
+                print tag
+            tags.append(tag)
+        print tags
+        return tags
+
+
+    @classmethod
     def add(cls,name,collection=None, toplevel_key=None, icon_data=None, \
           icon_id=None, icon_key=None, color=None, force_new_icon=False, auto_incr=True,
-          approved=False):
+          approved=False,**kwargs):
         """ Add a tag, if it not exists create one.
 
         If an 'icon_strucuture' is given a new icon is created for the icon DB,
@@ -195,7 +231,7 @@ class Tag(Iconize, CountableLazy, AddCollection, model.Base):
 
     @classmethod
     def approve(cls,name,collection=None,approved=True):
-        """The method approves a tag, by default only global tags need improvement"""
+        """The method approves a tag, by default only global tags need approvement"""
         name = TagValidator.name(name)
         col = collection or Collection.top_key()
         tag_db = Tag.tag_to_key(name,col).get()
@@ -264,6 +300,10 @@ class Tag(Iconize, CountableLazy, AddCollection, model.Base):
           +"---------------------------------------+"
       print
       print
+
+    PUBLIC_PROPERTIES = ['name', 'color', 'icon_url', 'cnt', 'collection','category']
+
+    PRIVATE_PROPERTIES = ['icon_id','approved']
 
 class TagRelation(CountableLazy, AddCollection, model.Base): # use the counter mixin
     """Tag relation model
@@ -447,7 +487,7 @@ class Taggable(ndb.Model): # use the counter mixin
     #_new_tags = []
 
     def add_tags(self, tags):
-        """Adds a tags as strings.
+        """Add tags as strings. (tags needs to be a list)
 
         Color and icon are saved in the 'Tag' model.
         All tag names are change to lower letters and double entries are deleted."""

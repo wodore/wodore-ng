@@ -22,12 +22,13 @@
     <span flex=""></span>
 
     <!- COLLECTION ->
+-->
     <div  hide show ng-if="auth.isLogged()"
             ng-include="'/p/modules/core/layout/collection_menu.client.view.html'"></div>
--->
     <!-- USER AVATAR -->
     <md-button hide show ng-if="auth.isLogged()" ui-sref="profile.view({username : auth.user.username})"
-       layout="row" layout-align="end center" class="md-icon-button">
+       layout="row" layout-align="end center" class="md-icon-button"
+       flex="none">
        <!--<span class="mar-rig-10">{{auth.user.username}}</span>-->
         <img ng-if="auth.user" class="profile-pic" 
               ng-src="{{auth.user.avatar_url}}&s=50"/>

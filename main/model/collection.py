@@ -7,7 +7,7 @@ from google.appengine.ext import ndb
 # import do not work yet (for unit test)
 # add them later
 import model
-#import util
+import util
 #import config
 
 #from .tag import Taggable#, TagStructure, Tag, TagRelation
@@ -19,6 +19,7 @@ from flask_restful import inputs
 class CollectionValidator(model.BaseValidator):
     name = [2,20]
     description = [0,140]
+    avatar_url = util.URL_REGEX
 
 
 class Collection(CountableLazy, model.Base):
@@ -42,6 +43,16 @@ class Collection(CountableLazy, model.Base):
     public = ndb.BooleanProperty(required=True,default=False)
     private = ndb.BooleanProperty(required=True,default=False)
     creator = ndb.KeyProperty(kind="User") # default: current user key
+    #avatar_url = ndb.StringProperty(default='', validator=CollectionValidator.create('avatar_url', required=False))
+    avatar_url = ndb.StringProperty(default='',required=True, indexed=False)
+
+    #@property
+    #def avatar_url(self):
+        #"""Returns gravatar url, created from user's email or username"""
+        #if self.link_to_avatar != '':
+            #return self.link_to_avatar
+        #else:
+            #return 'https://robohash.org/{key}?set=set1&bgset=bg2&size=150x150'.format(key=self.key)
 
     @staticmethod
     def top_key():
@@ -62,7 +73,7 @@ class Collection(CountableLazy, model.Base):
     def create_or_update_private(cls,creator_key=None, \
             creator_db=None):
         """ Creates a private collection """
-        print "Create private user collection"
+        print "Create private user collection for '{}'".format(creator_key or creator_db.username)
         if model.CollectionUser.update_user(\
             user_db=creator_db, user_key=creator_key):
             return True
@@ -81,6 +92,8 @@ class Collection(CountableLazy, model.Base):
     @classmethod
     def create_or_update(cls,key=None,**kwargs):
         """ Updates a collection or creates a new one """
+        print kwargs
+        print key
         if key:
             db = key.get()
             db.populate(**kwargs)
@@ -94,7 +107,7 @@ class Collection(CountableLazy, model.Base):
 
     @classmethod
     def create(cls,name,creator,description=None,public=False,\
-          private=False, active=True):
+          private=False, active=True,avatar_url=''):
         """ Creates and puts a new collection to the database.
         The property creator is mandatory, it is best to given the current logged
         in user with: auth.current_user_key()
@@ -102,7 +115,7 @@ class Collection(CountableLazy, model.Base):
         Returns collection key
         """
         new_col = Collection(name=name,creator=creator,active=active, \
-           private=private, public=public)
+           private=private, public=public,avatar_url=avatar_url)
         if description != None:
             new_col.description = description
         else:
@@ -148,14 +161,16 @@ class Collection(CountableLazy, model.Base):
                 continue
               # TODO create key with email (function in User)
             db, new = CollectionUser.get_or_create(CollectionUser.to_key_id(user_key), \
-                parent=collection_key,user=user_key, \
+                parent=collection_key,user_key=user_key, \
                 permission=permission, user_collection_active=active, \
-                user_name = user_db.name, user_username=user_db.username,\
-                user_email=user_db.email, user_active=user_db.active, \
-                user_avatar_url = user_db.avatar_url, \
+                user = user_db, \
+                #user_name = user_db.name, user_username=user_db.username,\
+                #user_email=user_db.email, user_active=user_db.active, \
+                #user_avatar_url = user_db.avatar_url, \
                 collection=collection_key, \
                 name = db_col.name, \
                 description = db_col.description, \
+                avatar_url = db_col.avatar_url, \
                 active = db_col.active, \
                 private = db_col.private, \
                 public = db_col.public)
@@ -312,7 +327,7 @@ class Collection(CountableLazy, model.Base):
 #
     #FIELDS.update(model.Base.FIELDS)
 
-    PUBLIC_PROPERTIES = ['name', 'description', 'active', 'creator', 'public', 'private', 'cnt']
+    PUBLIC_PROPERTIES = ['name', 'description', 'active', 'creator', 'public', 'private', 'cnt','avatar_url']
 
     PRIVATE_PROPERTIES = []
 
@@ -388,20 +403,25 @@ class CollectionUser(AddCollection, model.Base):
     The collection key should be used as parent.
     """
      # collection should be the same as 'parent'
-    user = ndb.KeyProperty(kind="User",required=True) # default: current user key
+    user = ndb.StructuredProperty(model.User,required=True) # default: current user key
+    user_key = ndb.KeyProperty(kind="User",required=True) # default: current user key
     user_collection_active = ndb.BooleanProperty(required=True,default=True)
     permission = ndb.StringProperty(required=True,
         choices=['creator', 'admin','write','read','none'], default='read')
-    user_name = ndb.StringProperty(required=True) # name property of User
-    user_username = ndb.StringProperty(required=True) # username of User
-    user_email = ndb.StringProperty(default='') # email of the user
-    user_active = ndb.BooleanProperty(default=True) # is the user active
-    user_avatar_url = ndb.StringProperty()
+    has_write = ndb.ComputedProperty(lambda self: self.permission_to_number(self.permission) >= self.permission_to_number('write'))
+    has_read = ndb.ComputedProperty(lambda self: self.permission_to_number(self.permission) >= self.permission_to_number('read'))
+    is_admin = ndb.ComputedProperty(lambda self: self.permission_to_number(self.permission) >= self.permission_to_number('write'))
+    #user_name = ndb.StringProperty(required=True) # name property of User
+    #user_username = ndb.StringProperty(required=True) # username of User
+    #user_email = ndb.StringProperty(default='') # email of the user
+    #user_active = ndb.BooleanProperty(default=True) # is the user active
+    #user_avatar_url = ndb.StringProperty()
     name = ndb.StringProperty(required=True)
     description = ndb.TextProperty(required=True,default='')
     active =  ndb.BooleanProperty(required=True,default=True)
     private = ndb.BooleanProperty(required=True,default=False)
     public =  ndb.BooleanProperty(required=True,default=False)
+    avatar_url = ndb.StringProperty(default='',required=True, indexed=False)
 
     @classmethod
     def update_user(cls, user_key=None, user_db=None):
@@ -418,12 +438,13 @@ class CollectionUser(AddCollection, model.Base):
         # get all collections for this user
         dbs = []
         for db in cls.qry(user=user_key):
-            db.user_name = user_db.name
-            db.user_username = user_db.username
-            db.user_email = user_db.email
-            db.user_active = user_db.active
-            if user_db.avatar_url:
-                db.user_avatar_url = user_db.avatar_url
+            db.user = user_db
+            #db.user_name = user_db.name
+            #db.user_username = user_db.username
+            #db.user_email = user_db.email
+            #db.user_active = user_db.active
+            #if user_db.avatar_url:
+                #db.user_avatar_url = user_db.avatar_url
             dbs.append(db)
         return ndb.put_multi(dbs)
 
@@ -446,6 +467,7 @@ class CollectionUser(AddCollection, model.Base):
             db.active = col_db.active
             db.private = col_db.private
             db.public = col_db.public
+            db.avatar_url = col_db.avatar_url
             dbs.append(db)
         return ndb.put_multi(dbs)
 
@@ -481,9 +503,9 @@ class CollectionUser(AddCollection, model.Base):
             qry = cls.query(ancestor=collection,**kwargs)
         else:
             qry = cls.query(**kwargs)
-        if user:
+        if user: # TODO
             qry_tmp = qry
-            qry = qry.filter(cls.user==user)
+            qry = qry.filter(cls.user_key==user)
         #if collection:
             #qry_tmp = qry
             #qry = qry.ancestor(collection)
@@ -535,8 +557,8 @@ class CollectionUser(AddCollection, model.Base):
         user_active=None, **kwargs
               ):
         kwargs = cls.get_col_dbs(**kwargs)
-        return super(CollectionUser, cls).get_dbs(
-            user=user or util.param('user', ndb.Key),
+        return super(CollectionUser, cls).get_dbs( # TODO
+            user_key=user or util.param('user', ndb.Key),
             user_collection_active=user_collection_active or util.param('user_collection_active', bool),
             permission=permission or util.param('permission', str),
             user_name=user_name or util.param('user_name', str),
@@ -546,7 +568,8 @@ class CollectionUser(AddCollection, model.Base):
             **kwargs
           )
 
-    PUBLIC_PROPERTIES = ['user_collection_active', 'user_name', 'user_username', 'user_email', 'user_active', 'user_avatar_url', 'name', 'description', 'private', 'public','permission','active','collection','user']
+    #PUBLIC_PROPERTIES = ['user_collection_active', 'user_name', 'user_username', 'user_email', 'user_active', 'user_avatar_url', 'name', 'description', 'private', 'public','permission','active','collection','user','user_key','avatar_url']
+    PUBLIC_PROPERTIES = ['user_collection_active', 'name', 'description', 'private', 'public','permission','active','collection','user','user_key','avatar_url','has_write','has_read','is_admin']
 
     PRIVATE_PROPERTIES = ['', '']
 

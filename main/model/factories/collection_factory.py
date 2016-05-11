@@ -33,9 +33,13 @@ class CollectionFactory(BaseFactory):
 
     @classmethod
     def create_private(cls):
+        print "==================================================="
+        print "Create private collections"
+        print
         user_keys = model.User.query().fetch(limit=1000, keys_only=True)
         for key in user_keys:
             model.Collection.create_or_update_private(creator_key=key)
+        print
 
 
     @classmethod
@@ -44,7 +48,9 @@ class CollectionFactory(BaseFactory):
         creator set to an email adress this user is used or set to "random"
         in order to use different, random users"""
 
+        print "==================================================="
         print "Create collections"
+        print
         fake = Factory.create()
         # description length
         desc_min = 0
@@ -83,16 +89,18 @@ class CollectionFactory(BaseFactory):
                 name = name[0:19]
             elif len(name) < 2:
                 name = name+" Longer"
-            print creator
-            print name
-            print desc
             model.Collection.create(name=name,
                 creator=creator,
                 description=desc,
                 active=True,
                 public=False,
-                private=False
+                private=False,
+                avatar_url='https://robohash.org/{key}?set=set1&bgset=bg2&size=150x150'.format(key=random.randint(1,10000))
                 )
+            print "Collection {} '{}' for user '{}'".format(i, name, creator)
+        print "---------------------------------------------------"
+        print "{} collections created".format(i + 1)
+        print
 
 
     @classmethod
@@ -101,6 +109,9 @@ class CollectionFactory(BaseFactory):
         # it takes quite a long time
         #fake = Factory.create()
         #permission_list = ('none','read','write','admin','creator')
+        print "==================================================="
+        print "Add users to collections"
+        print
         permission_list = ('none','read','write','admin')
         user_keys = model.User.query().fetch(limit=1000, keys_only=True)
         cnt = 0
@@ -110,6 +121,7 @@ class CollectionFactory(BaseFactory):
             user_nr = int(user_min+random.random()*(user_max-user_min))
             cnt_users += user_nr
             users = random.sample(user_keys,user_nr)
+            print "Add {} users to collection '{}'".format(user_nr, key)
             if permission == "random":
               users_perm = []
               for user in users:
@@ -121,6 +133,7 @@ class CollectionFactory(BaseFactory):
             cnt += 1
         print 'Added a total of {usr_nr} users to {nr} collections'.\
                 format(usr_nr=cnt_users, nr=cnt)
+        print
 
 
 

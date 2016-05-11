@@ -40,10 +40,10 @@ all
                 <!--class="user-list-item"-->
 
 <md-progress-circular ng-if="collection === null" md-mode="indeterminate" class="md-accent" md-diameter="30"></md-progress-circular>
-            <img ng-src="{{collection.avatar}}" class="md-avatar" alt="{{collection.name}}"  ng-if="collection !== null"/>
-
+            <img ng-if="collection.avatar_url && collection !== null" ng-src="{{collection.avatar_url}}" class="md-avatar" alt="{{collection.name}}" />
+            <!--<md-icon ng-if="!collection.avatar_url && collection !== null" md-svg-icon="action:report_problem" class="md-avatar" alt="{{collection.name}}" />-->
           <div class="md-list-item-text">
-            <h3>{{collection.nr}} {{ collection.name }}</h3>
+            <h3>{{ collection.name }}<small> - {{ collection.permission }}</small></h3>
             <!--<h4>{{ collection.created }}</h4>-->
             <p>{{ collection.description | cut:true:50:' ...' }}</p>
           </div>

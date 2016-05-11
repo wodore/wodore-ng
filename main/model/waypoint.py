@@ -21,7 +21,7 @@ class WayPointValidator(model.BaseValidator):
     name = [1,20]
     description = [0,2000]
 
-class WayPoint(Taggable, AddCollection, model.Base):
+class WayPoint( model.Base, Taggable, AddCollection):
     name = ndb.StringProperty(required=True,\
         validator=WayPointValidator.create('name'))
     description = ndb.TextProperty(validator=WayPointValidator.create('description'))
@@ -30,29 +30,39 @@ class WayPoint(Taggable, AddCollection, model.Base):
     custom_fields = ndb.GenericProperty(repeated=True)
     creator = ndb.KeyProperty(kind="User") # default: current user key
 
+
+    @classmethod
+    def create_or_update(cls,key=None,**kwargs):
+        """ Updates a collection or creates a new one """
+        new_tags = kwargs.get('tags',[])
+        if key:
+            db = key.get()
+            kwargs['tags'] = db['tags']
+            db.populate(**kwargs)
+        else:
+            kwargs['tags'] = []
+            db = cls(**kwargs)
+        db.update_tags(new_tags)
+        key = db.put()
+        return key
+
+
+
+
     @classmethod
     def qry(cls, name=None, collection=None, tag=None, \
-          url=None,  order_by_date='modified', **kwargs):
+          url=None, **kwargs):
         """Query for way points"""
-        qry = cls.query(**kwargs)
+        #qry = cls.query(**kwargs)
+        qry = model.Base.qry(model.WayPoint,**kwargs)
         if name:
-            qry_tmp = qry
             qry = qry.filter(cls.name==name)
         if collection:
-            qry_tmp = qry
             qry = qry.filter(cls.collection==collection)
         if tag:
-            qry_tmp = qry
             qry = qry.filter(cls.tags==tag)
         if url:
-            qry_tmp = qry
             qry = qry.filter(cls.url==url.lower())
-        if order_by_date == 'modified':
-            qry_tmp = qry
-            qry = qry.order(-cls.modified)
-        elif order_by_date == 'created':
-            qry_tmp = qry
-            qry = qry.order(-cls.created)
         #else filter for private True and False
         return qry
 
@@ -87,6 +97,9 @@ class WayPoint(Taggable, AddCollection, model.Base):
         print
         print
 
+    PUBLIC_PROPERTIES = ['name', 'collection','description','url','geo','creator','tags']
+
+    PRIVATE_PROPERTIES = []
 
 
 # ADD them later

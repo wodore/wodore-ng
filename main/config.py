@@ -10,6 +10,7 @@ OFFLINE = False
 PRODUCTION = os.environ.get('SERVER_SOFTWARE', '').startswith('Google App Eng')
 DEVELOPMENT = not PRODUCTION
 APPLICATION_ID = app_identity.get_application_id()
+BUCKET = "/{id}.appspot.com".format(id=APPLICATION_ID)
 CURRENT_VERSION_ID = os.environ.get('CURRENT_VERSION_ID')
 CURRENT_VERSION_NAME = CURRENT_VERSION_ID.split('.')[0]
 CURRENT_VERSION_TIMESTAMP = long(CURRENT_VERSION_ID.split('.')[1]) >> 28

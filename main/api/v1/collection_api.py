@@ -11,7 +11,7 @@ import util
 from main import API
 from model import User, UserValidator
 import model
-from api.helpers import ArgumentValidator, make_list_response, make_empty_ok_response, make_bad_request_exception
+from api.helpers import ArgumentValidator, make_list_response, make_empty_ok_response, make_bad_request_exception, make_not_found_exception
 from flask import request, g, abort
 from pydash import _
 from api.decorators import model_by_key, user_by_username, authorization_required, admin_required, login_required
@@ -30,7 +30,7 @@ class CollectionsAPI(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('cursor', type=ArgumentValidator.create('cursor'))
         parser.add_argument('size', type=int, default=10)
-        parser.add_argument('total', type=int, default=True)
+        parser.add_argument('total', type=ArgumentValidator.create('boolTrue'),default=True)
         parser.add_argument('private',default='both')
         parser.add_argument('active',default='both')
         parser.add_argument('public',default='both')
@@ -98,23 +98,34 @@ class CollectionsByUsernameAPI(Resource):
 @API.resource('/api/v1/collections/<string:key>')
 class CollectionAPI(Resource):
     @login_required
-    @model_by_key
     def get(self,key):
         """Updates user's properties"""
+        try:
+            model_key = ndb.Key(urlsafe=key)
+            model_db = model_key.get()
+        except:
+            if key.lower().strip() == 'global':
+                model_key = model.Collection.top_key()
+                model_db = model_key.get()
+            else:
+                return make_not_found_exception()
 
         if auth.is_admin():
             properties = model.Collection.get_private_properties()
         else:
             properties = model.Collection.get_public_properties()
-        g.model_db.permission = model.Collection.has_permission(g.model_key,auth.current_user_key())
-        g.model_db.permissionNr = model.CollectionUser.permission_to_number(g.model_db.permission)
-        return g.model_db.to_dict(include=properties+['permission','permissionNr'])
+        model_db.permission = 'read' if model_db.public else model.Collection.has_permission(model_key,auth.current_user_key())
+        model_db.permissionNr = model.CollectionUser.permission_to_number(model_db.permission)
+        model_db.has_write = 'write' if model_db.public else model.Collection.has_permission(model_key,auth.current_user_key())
+        model_db.has_read = 'read' if model_db.public else model.Collection.has_permission(model_key,auth.current_user_key())
+        model_db.is_admin = 'admin' if model_db.public else model.Collection.has_permission(model_key,auth.current_user_key())
+        return model_db.to_dict(include=properties+['permission','permissionNr','has_write','has_read','is_admin'])
 
 
     @login_required
     def put(self,key):
         """Updates user's properties"""
-        update_properties = ['name', 'creator', 'description', 'public', 'private', 'active','key']
+        update_properties = ['name', 'creator', 'description', 'public', 'private', 'active','key','avatar_url']
         #print request.json
         data = _.pick(request.json, update_properties)
 
@@ -132,10 +143,10 @@ class CollectionAPI(Resource):
         print "Arguments for create_or_update"
         print data
         key = model.Collection.create_or_update(**data)
-        if auth.is_admin():
-            properties = model.Collection.get_private_properties()
-        else:
-            properties = model.Collection.get_public_properties()
+        #if auth.is_admin():
+            #properties = model.Collection.get_private_properties()
+        #else:
+            #properties = model.Collection.get_public_properties()
         return {'key':key.urlsafe()}
         #return make_empty_ok_response()
 

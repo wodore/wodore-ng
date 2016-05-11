@@ -72,34 +72,36 @@ class UserSearchAPI(Resource):
             users = [];
             for key in collection_keys:
                 query = model.CollectionUser.query(ancestor=key)
-                if len(args.q) > 1:
+                if len(args.q) > 2:
                     query = query \
-                        .filter(model.CollectionUser.user_username >= args.q) \
-                        .filter(model.CollectionUser.user_username <= unicode(args.q) + u"\ufffd")\
-                        .order(model.CollectionUser.user_username)
+                        .filter(model.CollectionUser.user.username >= args.q) \
+                        .filter(model.CollectionUser.user.username <= unicode(args.q) + u"\ufffd")\
+                        .order(model.CollectionUser.user.username)
                 else:
                     query = query.order(model.CollectionUser.modified)
 
                 users_future =  query.fetch_async(
                                     limit=args.size,
-                                    projection=['modified','user','user_username','user_email','user_avatar_url'])
+                                    projection=['modified','user.username','user.email','user.avatar_url','user_key'])
                 users = users + users_future.get_result()
                 #users = users + [{'key':u.key,'modified':u.modified} for u in users_future.get_result()]
             # check if a user with this name or email exists:
             user_db = model.User.get_by_email_or_username(args.q) if len(args.q)>2 else None
-            if user_db:
-                user = model.CollectionUser(user= user_db.key,
-                        user_username = user_db.username,
-                        user_email = user_db.email,
-                        user_avatar_url = user_db.avatar_url,
-                        name = "Just Temp User",
-                        modified = datetime.datetime.now(),
-                        created = datetime.datetime.now())
+            if user_db: # create temp user with modified now -> first in list
+                user = model.CollectionUser(
+                            user_key= user_db.key,
+                            user = model.User(username = user_db.username,
+                                    email = user_db.email,
+                                    avatar_url = user_db.avatar_url),
+                            name = "Just Temp User",
+                            modified = datetime.datetime.now(),
+                            created = datetime.datetime.now()
+                        )
                 users.append(user)
             # sort users after its last modification
-            users = util.sort_uniq(users,'modified','user_username',reverse=False)
+            users = util.sort_uniq(users,'modified','user_key',reverse=False)
             #users = [u.urlsafe() for u in users]
-            users = [u.to_dict(include=['modified','user','user_username','user_email','user_avatar_url']) for u in users]
+            users = [u.to_dict(include=['modified','user','user_key']) for u in users]
 
             total = len(users)
             if total > args.size:
@@ -109,19 +111,19 @@ class UserSearchAPI(Resource):
 
 
 
-        users_query = User.query()
-        if len(args.q) > 2:
-            users_query = users_query \
-                .filter(User.username >= args.q) \
-                .filter(User.username <= unicode(args.q) + u"\ufffd")
-        users_future = users_query \
-            .order(User.username) \
-            .fetch_page_async(15, start_cursor=args.cursor)
+        #users_query = User.query()
+        #if len(args.q) > 2:
+            #users_query = users_query \
+                #.filter(User.username >= args.q) \
+                #.filter(User.username <= unicode(args.q) + u"\ufffd")
+        #users_future = users_query \
+            #.order(User.username) \
+            #.fetch_page_async(15, start_cursor=args.cursor)
 
         #total_count_future = User.query().count_async(keys_only=True)
-        users, next_cursor, more = users_future.get_result()
-        users = [u.to_dict(include=['name','username','email','avatar_url']) for u in users]
-        return make_list_response(users, next_cursor, more, None)
+        #users, next_cursor, more = users_future.get_result()
+        #users = [u.to_dict(include=['name','username','email','avatar_url']) for u in users]
+        #return make_list_response(users, next_cursor, more, None)
 
 
 

@@ -16,7 +16,7 @@ from .collection import Collection, AddCollection
 
 
 class RouteValidator(model.BaseValidator):
-    name = [4,30]
+    name = [2,30]
     description = [0,20000]
 
 class RouteRefStructure(ndb.Model): # use the counter mixin

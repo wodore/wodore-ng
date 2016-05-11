@@ -10,14 +10,26 @@
      */
 
     module.service('wdCollections', function(Restangular,$log,
-                $q, gaAuthentication) {
+                $q, gaAuthentication, wdWayPoints) {
 
         var self = this;
+        var fields = ['name','description','avatar_url','id','key','creator','modified','created','cnt','private','public','permission','permissionNr','has_write','has_read','is_admin'];
         this.more = {};
         this.loading = false;
         this.total = 0;
         this.listByKey = {};
         this.indexToId = [];
+        this.active_collection = {};
+        //Restangular.one('collections','global').get()
+            //.then(function(collection) {
+                ////$log.info("Set active collection to:")
+                //$log.info(collection)
+                //for (var i=0;i<fields.length; i++){
+                    //self.active_collection[fields[i]] = collection[fields[i]];
+                //}
+                //$log.info(self.active_collection)
+            //});
+        
 
         var nextCursor = {}
 
@@ -59,7 +71,6 @@
                          size: size }, filter)
                 $log.info(args);
                 var collections_api = Restangular.one('users',username).all('collections')
-                $log.error(collections_api);
                 collections_api.getList(args)
                 //Restangular.all('collections/'+username).getList(args)
                 //Restangular.one('collections',username).getList()
@@ -74,7 +85,7 @@
 
                             // user Collection key and not CollectionUser
                             if(col.hasOwnProperty('collection')){
-                                col.key = col.collection
+                                col.key = col.collection // overwrite CollectionUser key!
                             } else {
                                 col.collection = col.key
                             }
@@ -82,8 +93,6 @@
                                 col.self = {link: '/api/v1/collections/'+col.key}
                             }
 
-                            // TODO wrong, needs to find col.key in props
-                            // and the update it if it exits.
                             var indexExists = _.findIndex(self.indexToId, ['key', col.key]);
                             if(indexExists > -1){
                                 $log.warn("Collection already exists -> update");
@@ -105,8 +114,8 @@
                                     });
                             }
                             self.listByKey[col.key] = col;
-                            self.listByKey[col.key]['nr'] = self.loadedLen() + 1;
-                            self.listByKey[col.key]['avatar'] = "https://robohash.org/"+col.key+"?set=set1&bgset=bg2&size=150x150"
+                            //self.listByKey[col.key]['nr'] = self.loadedLen() + 1;
+                            //self.listByKey[col.key]['avatar'] = "https://robohash.org/"+col.key+"?set=set1&bgset=bg2&size=150x150"
                         }
                         if ( oldCursor === nextCursor[filterName] ){
                             $log.warn("Same cursor, data is updated")
@@ -209,7 +218,7 @@
                         if(! collection.hasOwnProperty('collection')){
                             collection.collection = obj.key;
                         }
-                        collection.avatar = "https://robohash.org/"+obj.key+"?set=set1&bgset=bg2&size=150x150"
+                        //collection.avatar = "https://robohash.org/"+obj.key+"?set=set1&bgset=bg2&size=150x150"
 
                         self.listByKey[obj.key] = collection;
                         deferred.resolve(collection);
@@ -231,12 +240,9 @@
             filter = typeof filter !== 'undefined' ? filter : false;
             if ( sort !== false ){
                 var list =  _.orderBy(self.listByKey, sort, order);
-                $log.debug("ORDER LIST")
-                $log.debug(sort)
-                $log.debug(order)
                 byId = false;
             }
-            if(byId && sort !== false){
+            if(byId && sort === false){
                 var list =  self.listByKey;
             } else {
                 // create index list
@@ -274,6 +280,65 @@
                     'write' : 'editor:mode_edit',
                     'admin' : 'editor:mode_edit',
                     'creator' : 'editor:mode_edit' }
+        
+        // Register callback functions to collection changes
+        var change_listeners = [];
+
+        this.change_event= function(callback) {
+            change_listeners.push(callback);
+        }
+
+
+        // TODO update not implemented yet
+        // if dont_update is true collection needs to be a collection object,
+        // otherwise a object or just a key, if dont_update is not set
+        // the data is updated from the server
+        this.set_collection = function(collection,dont_update) {
+            dont_update = typeof dont_update !== 'undefined' ? dont_update : false;
+            if (!dont_update){
+                if (collection.hasOwnProperty('key')){
+                    var collection = this.get({key:collection.key})
+                } else{
+                    var collection = this.get({key:collection})
+                }
+            }
+            for (var i=0;i<fields.length; i++){
+                self.active_collection[fields[i]] = collection[fields[i]];
+            }
+            $log.info("New active collection");
+            $log.info(self.active_collection);
+            // Load all waypoints for the collection.
+            
+            
+            wdWayPoints.load(self.active_collection.key).then(
+                function(more){
+                    $log.info("Waypoints loaded for collection "+self.active_collection.name);
+                });
+            wdWayPoints.set_current_waypoints(self.active_collection.key);
+
+
+            change_listeners.forEach(function(cb) {
+                cb();
+            });
+
+
+        // Tile servers
+        }
+
+        this.get_collection = function() {
+            return self.active_collection
+        }
+
+        // load the user list and set it as default (the last used)
+        this.load(1).then(function(collection) {
+                $log.info("Set active collection to:")
+                $log.info(collection[0])
+                self.set_collection(collection[0])
+                //for (var i=0;i<fields.length; i++){
+                    //self.active_collection[fields[i]] = collection[0][fields[i]];
+                //}
+                $log.info(self.active_collection)
+            });
 
     });
 

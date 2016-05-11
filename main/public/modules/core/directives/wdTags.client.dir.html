@@ -1,0 +1,87 @@
+  <div layout="column">
+    <form name="tagForm" layout="row">
+      <md-chips 
+          name="Tags"
+          ng-model="$wdTagCtrl.tags"
+          md-max-chips="10"
+          md-transform-chip="$wdTagCtrl.newTag($chip)"
+          >
+
+
+      <md-autocomplete
+          md-selected-item="$wdTagCtrl.selectedTags"
+          md-search-text="$wdTagCtrl.searchText"
+          md-items="tag in $wdTagCtrl.tagSuggestions($wdTagCtrl.searchText)"
+          md-item-text="tag.name"
+          placeholder="Tag+">
+            <img ng-src="{{tag.icon_url}}" alt="{{tag.name}}" ng-if="tag.icon_url" style="width:20px;"/>
+        <span md-highlight-text="$wdTagCtrl.searchText">
+                {{tag.name}}</span>
+      </md-autocomplete>
+
+      <md-chip-template wd-chip-class="md-button md-raised" wd-chip-ng-style="
+                      {'background': $chip.color,
+                       'color': 'white',
+                       'min-width': '40px',
+                       'height': '20px',
+                       'max-height': '20px',
+                       'min-height': '20px',
+                       'margin': '5px 5px 0 0',
+                       'padding': '0 6px 0 6px',
+                       'font-size': '12px',
+                       'line-height': '18px',
+                       'border-radius': '4px',
+                       'text-transform': 'none'}" 
+                       >
+      <!--<md-icon md-svg-src="{{$chip.icon_url}}" class="s24" aria-label="{{$chip.name}}"  ng-if="$chip.icon_url"  ></md-icon>-->
+          <img ng-src="{{$chip.icon_url}}" style="height:13px;color: {{$chip.color}};" aria-label="{{$chip.name}}"  ng-if="$chip.icon_url"  ></img>
+          <strong>{{$chip.name}}</strong>
+        </md-chip-template>
+      </md-chips>
+      <!--<div class="errors" ng-messages="tagForm.Tags.$error">
+        <div ng-message="md-max-chips">The maxmium of chips is reached.</div>
+      </div>-->
+
+
+    <md-button class="md-fab md-mini md-warning" aria-label="add tags" ng-click="$wdTagCtrl.addTags()" ng-disabled="!$wdTagCtrl.inputTags" flex="none">
+<md-tooltip md-direction="right">
+          add tags
+        </md-tooltip>
+          <md-icon md-svg-icon="content:add" ></md-icon>
+        </md-button>
+
+
+    </form>             
+
+<md-content layout="column" md-whiteframe="1" layout-padding style="min-width:400px">
+<div layout="row">
+    <md-button class="md-fab md-mini md-primary" aria-label="More Tags" ng-click="$wdTagCtrl.getSomeTags()" ng-disabled="!$wdTagCtrl.moreTags || $wdTagCtrl.moreTagsLoading">
+        <md-tooltip md-direction="right">
+          load more tags
+        </md-tooltip>
+        <md-icon md-svg-icon="notification:sync" ></md-icon>
+    </md-button>
+</div>
+<div layout-wrap layout="row">
+    <md-button class="md-raised" ng-repeat="tag in $wdTagCtrl.someTags"
+                style="background: {{tag.color}};
+                       color: white;
+                       min-width: 40px;
+                       height: 20px;
+                       max-height: 20px;
+                       min-height: 20px;
+                       margin: 5px 5px 0 0;
+                       padding: 0 6px 0 6px;
+                       font-size: 12px;
+                       line-height: 18px;
+                       text-transform: none;"
+          ng-click="$wdTagCtrl.newTag(tag.name)" >
+          <img ng-src="{{tag.icon_url}}" style="height:13px;" aria-label="{{tag.name}}"  ng-if="tag.icon_url"  ></img>
+    {{tag.name}}
+          </md-button>
+</div>
+
+</md-content>
+ 
+
+</div>

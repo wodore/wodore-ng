@@ -4,6 +4,9 @@
 
 from .user_api import *
 from .collection_api import *
+from .tag_api import *
+from .waypoint_api import *
+from .upload_api import *
 from .feedback_api import *
 from .auth_api import *
 from .config_api import *

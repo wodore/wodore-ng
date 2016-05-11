@@ -17,7 +17,10 @@ var AppConfig = (function() {
         'lrInfiniteScroll',
         'angulartics',
         'angulartics.google.analytics',
-        'leaflet-directive'
+        //'leaflet-directive',
+        'nemLogging',
+        'ui-leaflet',
+        'ngFileUpload',
     ];
 
     // Add a new vertical module

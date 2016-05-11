@@ -1,0 +1,6 @@
+# Open all important PYTHON files
+gvim main/api/*.py main/api/**/*.py main/auth/auth.py main/control/*.py main/model/*.py main/model/factories/*.py main/tests/*.py
+
+# Open all important WEB files 
+gvim main/public/application.js main/public/modules/**/**/*.js main/public/modules/**/**/*.html main/public/modules/**/**/*.less
+

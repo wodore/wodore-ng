@@ -1,4 +1,17 @@
 <form name="collectionEditForm">
+    <div>
+<md-button class="md-fab" aria-label="Eat cake"
+        ngf-select="uploadFiles(files, invalidFiles)" ng-model="avatar" 
+        ngf-resize="{width: 200, height: 200, quality: 1.0, type: 'image/jpeg', centerCrop: true}" 
+        accept="image/*" ngf-max-height="5000" ngf-max-size="10MB"
+        ngf-keep="false"  >
+            <md-icon md-svg-icon="image:photo_camera"></md-icon>
+        </md-button>
+
+</div>
+    <span class="progress" ng-show="avatar.progress >= 0">
+        <div style="width:{{avatar.progress}}%" ng-bind="avatar.progress + '%'"></div>
+    </span>
     <md-input-container>
         <label>Name</label>
         <input ng-model="editCol.name"
@@ -21,6 +34,15 @@
                show-counter="true"
                tabindex="3">
     </md-input-container>
+    <!--<md-input-container>
+        <label>Avatar URL</label>
+        <input ng-model="editCol.avatar_url"
+               name="AvatarURL"
+               ga-input-validator
+               validator-category="avatar_url"
+               show-counter="false"
+               tabindex="4">
+    </md-input-container>-->
      <div ng-if="auth.isAdmin()">
         <md-checkbox ng-model="editCol.private">
             Private
@@ -34,22 +56,28 @@
     </div>
 
      <md-chips flex class="md-contact-chips"
-        ng-model="users"
-        md-contacts="delayedQuerySearch($query)"
-        md-contact-name="user_username"
-        md-contact-image="user_avatar_url"
-        md-contact-email="user_email"
+        ng-model="users" md-autocomplete-snap
         md-require-match="false"
         md-highlight-flags="i"
-        filter-selected="ctrl.filterSelected"
         md-separator-keys="customKeys"
-        placeholder="To">
+        placeholder="User+">
+      <md-autocomplete
+          md-selected-item="selectedItem"
+          md-search-text="searchText"
+          md-items="item in delayedQuerySearch(searchText)"
+          md-item-text="item.user.username"
+          placeholder="User+">
+            <img ng-src="{{item.user.avatar_url}}" alt="{{item.user.username}}" ng-if="item.user.avatar_url" style="width:30px;"/>
+        <span md-highlight-text="searchText">
+                {{item.user.username}}</span> - <small><span md-highlight-text="searchText">{{item.user.email}}</span></small>
+      </md-autocomplete>
+
                             <md-chip-template>
                                 <div class="md-contact-avatar">
-                                    <img ng-src="{{$chip.user_avatar_url}}" alt="{{$chip.user_username}}" ng-if="$chip.user_avatar_url" />
+                                    <img ng-src="{{$chip.user.avatar_url}}" alt="{{$chip.user.username}}" ng-if="$chip.user.avatar_url" />
                                 </div>
                                 <div class="md-contact-name">
-                                    {{$chip.user_username}}
+                                    {{$chip.user.username}}
                                     <!--<md-icon md-svg-icon="{{permIcons[$chip.permission]}}" aria-label="{{$chip.permission}}" class="md-secondary md-hue-3" ng-if="$chip.permission" ></md-icon>-->
                                     <md-select ng-model="$chip.permission" style="display: inherit; margin: 0; width: 25px;" md-selected-text="returnIcon($chip.permission)" ng-if="$chip.permission !== 'creator'" >
     <md-select-header>
@@ -69,20 +97,20 @@
         <md-icon md-svg-icon="md-close"></md-icon>
       </button>
 </md-chips>
-
+<!--
     <md-contact-chips
         ng-model="users"
         md-contacts="delayedQuerySearch($query)"
-        md-contact-name="user_username"
-        md-contact-image="user_avatar_url"
-        md-contact-email="user_email"
+        md-contact-name="user['username']"
+        md-contact-image="user.avatar_url"
+        md-contact-email="user.email"
         md-require-match="false"
         md-highlight-flags="i"
         filter-selected="ctrl.filterSelected"
         md-separator-keys="customKeys"
         placeholder="To">
     </md-contact-chips>
-
+-->
 
     <div layout="row" layout-margin>
         <md-button flex ui-sref="collection.view({collection: collection.key})">Cancel</md-button>
